@@ -153,10 +153,22 @@ local Queue: any = {
 
 Queue.Reliable[1] = table.create(256)
 Queue.Reliable[3] = table.create(256)
+Queue.Reliable[4] = table.create(256)
+Queue.Reliable[6] = table.create(256)
+Queue.Reliable[7] = table.create(256)
+Queue.Reliable[8] = table.create(256)
 export type Items = ("Wooden Rod" | "Plastic Rod" | "Fish Test One" | "Fish Test Two")
 export type ItemData = { Name: ("Wooden Rod" | "Plastic Rod" | "Fish Test One" | "Fish Test Two"), Count: number, Data: { UniqueId: number, Level: number?, XP: number? } }
 export type PlayerData = { Coins: number?, Inventory: { { Name: ("Wooden Rod" | "Plastic Rod" | "Fish Test One" | "Fish Test Two"), Count: number, Data: { UniqueId: number, Level: number?, XP: number? } } }?, Gamepasses: { number }? }
 export type EntityData = {  }
+export type Bill = { congress: number, latestAction: { action: string?, text: string? }?, number: string, originalChamber: string?, title: string, type: string, updateDate: string }
+export type Amendment = { congress: number, latestAction: { action: string?, text: string? }?, number: string, purpose: string?, type: string, updateDate: string }
+export type Member = { bioguideId: string, name: string, partyName: string, state: string, terms: { item: { { chamber: string, startYear: number } } }, updateDate: string }
+export type UGT = { Authenticated: boolean, Data: string, Lean: number, PublishDate: number, Publisher: number, Title: string }
+export type SimBillCore = { Content: string, Name: string, Prewrittens: { string }, Topics: { string } }
+export type SimBill = { Authenticated: boolean, Bill: { Content: string, Name: string, Prewrittens: { string }, Topics: { string } }, PublishDate: number, Publisher: number }
+export type SimPassData = { Passed: boolean, Votes: {[string]: boolean} }
+export type InteractionRes = { Result: string, Success: boolean }
 local function WriteEVENT_PlayerDataReplication(Value: { Coins: number?, Inventory: { { Name: ("Wooden Rod" | "Plastic Rod" | "Fish Test One" | "Fish Test Two"), Count: number, Data: { UniqueId: number, Level: number?, XP: number? } } }?, Gamepasses: { number }? }): ()
 	-- Allocate BLOCK: 4 bytes
 	local BLOCK_START = Allocate(4)
@@ -365,6 +377,588 @@ local function WriteFUNCTION_RETURN_FetchEntities(Value: {[number]: {  }}, Invoc
 	buffer.writeu16(SendBuffer, BLOCK_START + 3, Elements_1)
 end
 
+local function ReadEVENT_StateRequest(): (nil)
+	return nil
+end
+
+local function WriteEVENT_UpdateState(Value: { Amendment: { { congress: number, latestAction: { action: string?, text: string? }?, number: string, purpose: string?, type: string, updateDate: string } }?, Bill: { { congress: number, latestAction: { action: string?, text: string? }?, number: string, originalChamber: string?, title: string, type: string, updateDate: string } }?, Members: {[string]: { { bioguideId: string, name: string, partyName: string, state: string, terms: { item: { { chamber: string, startYear: number } } }, updateDate: string } }}?, UGT: {[string]: { Authenticated: boolean, Data: string, Lean: number, PublishDate: number, Publisher: number, Title: string }}?, SimBill: {[string]: { Authenticated: boolean, Bill: { Content: string, Name: string, Prewrittens: { string }, Topics: { string } }, PublishDate: number, Publisher: number }}? }): ()
+	-- Allocate BLOCK: 6 bytes
+	local BLOCK_START = Allocate(6)
+	buffer.writeu8(SendBuffer, BLOCK_START + 0, 5)
+	buffer.writeu8(SendBuffer, BLOCK_START + 1, Value.Amendment ~= nil and 1 or 0)
+	if Value.Amendment ~= nil then
+		-- Allocate BLOCK: 2 bytes
+		local BLOCK_START = Allocate(2)
+		-- START ARRAY
+		buffer.writeu16(SendBuffer, BLOCK_START + 0, #Value.Amendment)
+			-- Allocate BLOCK: 12 bytes
+		local ARRAY_START_2 = Allocate(12 * #Value.Amendment)
+		for Index = 1, #Value.Amendment do
+			local Item_2 = Value.Amendment[Index]
+			-- Allocate 4
+			local OPERATION_OFFSET_0 = ARRAY_START_2
+			ARRAY_START_2 += 4
+			buffer.writeu32(SendBuffer, OPERATION_OFFSET_0, Item_2.congress)
+			-- Allocate 1
+			local OPERATION_OFFSET_1 = ARRAY_START_2
+			ARRAY_START_2 += 1
+			buffer.writeu8(SendBuffer, OPERATION_OFFSET_1, Item_2.latestAction ~= nil and 1 or 0)
+			if Item_2.latestAction ~= nil then
+				-- Allocate BLOCK: 2 bytes
+				local BLOCK_START = Allocate(2)
+				buffer.writeu8(SendBuffer, BLOCK_START + 0, Item_2.latestAction.action ~= nil and 1 or 0)
+				if Item_2.latestAction.action ~= nil then
+					-- Allocate BLOCK: 2 bytes
+					local BLOCK_START = Allocate(2)
+					local Length = #Item_2.latestAction.action
+					buffer.writeu16(SendBuffer, BLOCK_START + 0, Length)
+					Allocate(Length)
+					buffer.writestring(SendBuffer, SendOffset, Item_2.latestAction.action, Length)
+				end
+				buffer.writeu8(SendBuffer, BLOCK_START + 1, Item_2.latestAction.text ~= nil and 1 or 0)
+				if Item_2.latestAction.text ~= nil then
+					-- Allocate BLOCK: 2 bytes
+					local BLOCK_START = Allocate(2)
+					local Length = #Item_2.latestAction.text
+					buffer.writeu16(SendBuffer, BLOCK_START + 0, Length)
+					Allocate(Length)
+					buffer.writestring(SendBuffer, SendOffset, Item_2.latestAction.text, Length)
+				end
+			end
+			local Length = #Item_2.number
+			-- Allocate 2
+			local OPERATION_OFFSET_2 = ARRAY_START_2
+			ARRAY_START_2 += 2
+			buffer.writeu16(SendBuffer, OPERATION_OFFSET_2, Length)
+			Allocate(Length)
+			buffer.writestring(SendBuffer, SendOffset, Item_2.number, Length)
+			-- Allocate 1
+			local OPERATION_OFFSET_3 = ARRAY_START_2
+			ARRAY_START_2 += 1
+			buffer.writeu8(SendBuffer, OPERATION_OFFSET_3, Item_2.purpose ~= nil and 1 or 0)
+			if Item_2.purpose ~= nil then
+				-- Allocate BLOCK: 2 bytes
+				local BLOCK_START = Allocate(2)
+				local Length = #Item_2.purpose
+				buffer.writeu16(SendBuffer, BLOCK_START + 0, Length)
+				Allocate(Length)
+				buffer.writestring(SendBuffer, SendOffset, Item_2.purpose, Length)
+			end
+			local Length = #Item_2.type
+			-- Allocate 2
+			local OPERATION_OFFSET_4 = ARRAY_START_2
+			ARRAY_START_2 += 2
+			buffer.writeu16(SendBuffer, OPERATION_OFFSET_4, Length)
+			Allocate(Length)
+			buffer.writestring(SendBuffer, SendOffset, Item_2.type, Length)
+			local Length = #Item_2.updateDate
+			-- Allocate 2
+			local OPERATION_OFFSET_5 = ARRAY_START_2
+			ARRAY_START_2 += 2
+			buffer.writeu16(SendBuffer, OPERATION_OFFSET_5, Length)
+			Allocate(Length)
+			buffer.writestring(SendBuffer, SendOffset, Item_2.updateDate, Length)
+		end
+		-- END ARRAY
+	end
+	buffer.writeu8(SendBuffer, BLOCK_START + 2, Value.Bill ~= nil and 1 or 0)
+	if Value.Bill ~= nil then
+		-- Allocate BLOCK: 2 bytes
+		local BLOCK_START = Allocate(2)
+		-- START ARRAY
+		buffer.writeu16(SendBuffer, BLOCK_START + 0, #Value.Bill)
+			-- Allocate BLOCK: 14 bytes
+		local ARRAY_START_2 = Allocate(14 * #Value.Bill)
+		for Index = 1, #Value.Bill do
+			local Item_2 = Value.Bill[Index]
+			-- Allocate 4
+			local OPERATION_OFFSET_0 = ARRAY_START_2
+			ARRAY_START_2 += 4
+			buffer.writeu32(SendBuffer, OPERATION_OFFSET_0, Item_2.congress)
+			-- Allocate 1
+			local OPERATION_OFFSET_1 = ARRAY_START_2
+			ARRAY_START_2 += 1
+			buffer.writeu8(SendBuffer, OPERATION_OFFSET_1, Item_2.latestAction ~= nil and 1 or 0)
+			if Item_2.latestAction ~= nil then
+				-- Allocate BLOCK: 2 bytes
+				local BLOCK_START = Allocate(2)
+				buffer.writeu8(SendBuffer, BLOCK_START + 0, Item_2.latestAction.action ~= nil and 1 or 0)
+				if Item_2.latestAction.action ~= nil then
+					-- Allocate BLOCK: 2 bytes
+					local BLOCK_START = Allocate(2)
+					local Length = #Item_2.latestAction.action
+					buffer.writeu16(SendBuffer, BLOCK_START + 0, Length)
+					Allocate(Length)
+					buffer.writestring(SendBuffer, SendOffset, Item_2.latestAction.action, Length)
+				end
+				buffer.writeu8(SendBuffer, BLOCK_START + 1, Item_2.latestAction.text ~= nil and 1 or 0)
+				if Item_2.latestAction.text ~= nil then
+					-- Allocate BLOCK: 2 bytes
+					local BLOCK_START = Allocate(2)
+					local Length = #Item_2.latestAction.text
+					buffer.writeu16(SendBuffer, BLOCK_START + 0, Length)
+					Allocate(Length)
+					buffer.writestring(SendBuffer, SendOffset, Item_2.latestAction.text, Length)
+				end
+			end
+			local Length = #Item_2.number
+			-- Allocate 2
+			local OPERATION_OFFSET_2 = ARRAY_START_2
+			ARRAY_START_2 += 2
+			buffer.writeu16(SendBuffer, OPERATION_OFFSET_2, Length)
+			Allocate(Length)
+			buffer.writestring(SendBuffer, SendOffset, Item_2.number, Length)
+			-- Allocate 1
+			local OPERATION_OFFSET_3 = ARRAY_START_2
+			ARRAY_START_2 += 1
+			buffer.writeu8(SendBuffer, OPERATION_OFFSET_3, Item_2.originalChamber ~= nil and 1 or 0)
+			if Item_2.originalChamber ~= nil then
+				-- Allocate BLOCK: 2 bytes
+				local BLOCK_START = Allocate(2)
+				local Length = #Item_2.originalChamber
+				buffer.writeu16(SendBuffer, BLOCK_START + 0, Length)
+				Allocate(Length)
+				buffer.writestring(SendBuffer, SendOffset, Item_2.originalChamber, Length)
+			end
+			local Length = #Item_2.title
+			-- Allocate 2
+			local OPERATION_OFFSET_4 = ARRAY_START_2
+			ARRAY_START_2 += 2
+			buffer.writeu16(SendBuffer, OPERATION_OFFSET_4, Length)
+			Allocate(Length)
+			buffer.writestring(SendBuffer, SendOffset, Item_2.title, Length)
+			local Length = #Item_2.type
+			-- Allocate 2
+			local OPERATION_OFFSET_5 = ARRAY_START_2
+			ARRAY_START_2 += 2
+			buffer.writeu16(SendBuffer, OPERATION_OFFSET_5, Length)
+			Allocate(Length)
+			buffer.writestring(SendBuffer, SendOffset, Item_2.type, Length)
+			local Length = #Item_2.updateDate
+			-- Allocate 2
+			local OPERATION_OFFSET_6 = ARRAY_START_2
+			ARRAY_START_2 += 2
+			buffer.writeu16(SendBuffer, OPERATION_OFFSET_6, Length)
+			Allocate(Length)
+			buffer.writestring(SendBuffer, SendOffset, Item_2.updateDate, Length)
+		end
+		-- END ARRAY
+	end
+	buffer.writeu8(SendBuffer, BLOCK_START + 3, Value.Members ~= nil and 1 or 0)
+	if Value.Members ~= nil then
+		-- Allocate BLOCK: 2 bytes
+		local BLOCK_START = Allocate(2)
+		local Elements_2 = 0
+		for Key_2, Element_2 in Value.Members do
+			Elements_2 += 1
+			local Length = #Key_2
+			local OFFSET_0 = Allocate(2)
+			buffer.writeu16(SendBuffer, OFFSET_0, Length)
+			Allocate(Length)
+			buffer.writestring(SendBuffer, SendOffset, Key_2, Length)
+			-- START ARRAY
+			local OFFSET_1 = Allocate(2)
+			buffer.writeu16(SendBuffer, OFFSET_1, #Element_2)
+				-- Allocate BLOCK: 12 bytes
+			local ARRAY_START_3 = Allocate(12 * #Element_2)
+			for Index = 1, #Element_2 do
+				local Item_3 = Element_2[Index]
+				local Length = #Item_3.bioguideId
+				-- Allocate 2
+				local OPERATION_OFFSET_0 = ARRAY_START_3
+				ARRAY_START_3 += 2
+				buffer.writeu16(SendBuffer, OPERATION_OFFSET_0, Length)
+				Allocate(Length)
+				buffer.writestring(SendBuffer, SendOffset, Item_3.bioguideId, Length)
+				local Length = #Item_3.name
+				-- Allocate 2
+				local OPERATION_OFFSET_1 = ARRAY_START_3
+				ARRAY_START_3 += 2
+				buffer.writeu16(SendBuffer, OPERATION_OFFSET_1, Length)
+				Allocate(Length)
+				buffer.writestring(SendBuffer, SendOffset, Item_3.name, Length)
+				local Length = #Item_3.partyName
+				-- Allocate 2
+				local OPERATION_OFFSET_2 = ARRAY_START_3
+				ARRAY_START_3 += 2
+				buffer.writeu16(SendBuffer, OPERATION_OFFSET_2, Length)
+				Allocate(Length)
+				buffer.writestring(SendBuffer, SendOffset, Item_3.partyName, Length)
+				local Length = #Item_3.state
+				-- Allocate 2
+				local OPERATION_OFFSET_3 = ARRAY_START_3
+				ARRAY_START_3 += 2
+				buffer.writeu16(SendBuffer, OPERATION_OFFSET_3, Length)
+				Allocate(Length)
+				buffer.writestring(SendBuffer, SendOffset, Item_3.state, Length)
+				-- START ARRAY
+				-- Allocate 2
+				local OPERATION_OFFSET_4 = ARRAY_START_3
+				ARRAY_START_3 += 2
+				buffer.writeu16(SendBuffer, OPERATION_OFFSET_4, #Item_3.terms.item)
+					-- Allocate BLOCK: 4 bytes
+				local ARRAY_START_4 = Allocate(4 * #Item_3.terms.item)
+				for Index = 1, #Item_3.terms.item do
+					local Item_4 = Item_3.terms.item[Index]
+					local Length = #Item_4.chamber
+					-- Allocate 2
+					local OPERATION_OFFSET_0 = ARRAY_START_4
+					ARRAY_START_4 += 2
+					buffer.writeu16(SendBuffer, OPERATION_OFFSET_0, Length)
+					Allocate(Length)
+					buffer.writestring(SendBuffer, SendOffset, Item_4.chamber, Length)
+					-- Allocate 2
+					local OPERATION_OFFSET_1 = ARRAY_START_4
+					ARRAY_START_4 += 2
+					buffer.writeu16(SendBuffer, OPERATION_OFFSET_1, Item_4.startYear)
+				end
+				-- END ARRAY
+				local Length = #Item_3.updateDate
+				-- Allocate 2
+				local OPERATION_OFFSET_5 = ARRAY_START_3
+				ARRAY_START_3 += 2
+				buffer.writeu16(SendBuffer, OPERATION_OFFSET_5, Length)
+				Allocate(Length)
+				buffer.writestring(SendBuffer, SendOffset, Item_3.updateDate, Length)
+			end
+			-- END ARRAY
+		end
+		buffer.writeu16(SendBuffer, BLOCK_START + 0, Elements_2)
+	end
+	buffer.writeu8(SendBuffer, BLOCK_START + 4, Value.UGT ~= nil and 1 or 0)
+	if Value.UGT ~= nil then
+		-- Allocate BLOCK: 2 bytes
+		local BLOCK_START = Allocate(2)
+		local Elements_2 = 0
+		for Key_2, Element_2 in Value.UGT do
+			Elements_2 += 1
+			local Length = #Key_2
+			local OFFSET_0 = Allocate(2)
+			buffer.writeu16(SendBuffer, OFFSET_0, Length)
+			Allocate(Length)
+			buffer.writestring(SendBuffer, SendOffset, Key_2, Length)
+			local OFFSET_1 = Allocate(1)
+			buffer.writeu8(SendBuffer, OFFSET_1, Element_2.Authenticated and 1 or 0)
+			local Length = #Element_2.Data
+			local OFFSET_2 = Allocate(2)
+			buffer.writeu16(SendBuffer, OFFSET_2, Length)
+			Allocate(Length)
+			buffer.writestring(SendBuffer, SendOffset, Element_2.Data, Length)
+			local OFFSET_3 = Allocate(2)
+			if Element_2.Lean > 65504 then
+				buffer.writeu16(SendBuffer, OFFSET_3, 0b0_11111_0000000000)
+			elseif Element_2.Lean < -65504 then
+				buffer.writeu16(SendBuffer, OFFSET_3, 0b1_11111_0000000000)
+			elseif Element_2.Lean ~= Element_2.Lean then
+				buffer.writeu16(SendBuffer, OFFSET_3, 0b1_11111_0000000001)
+			elseif Element_2.Lean == 0 then
+				buffer.writeu16(SendBuffer, OFFSET_3, 0)
+			else
+				local float = Element_2.Lean
+				local Abosulte = math.abs(float)
+				local Interval = math.ldexp(1, math.floor(math.log(Abosulte, 2)) - 10)
+				local RoundedValue = (Abosulte // Interval) * Interval
+				local Fraction, Exponent = math.frexp(RoundedValue)
+				Exponent += 14
+				local Mantissa = math.round(if Exponent <= 0
+					then Fraction * 0x400 / math.ldexp(1, math.abs(Exponent))
+					else Fraction * 0x800) % 0x400
+				local Result = Mantissa
+					+ math.max(Exponent, 0) * 0x400
+					+ if float < 0 then 0x8000 else 0
+				buffer.writeu16(SendBuffer, OFFSET_3, Result)
+			end
+			local OFFSET_4 = Allocate(4)
+			buffer.writeu32(SendBuffer, OFFSET_4, Element_2.PublishDate)
+			local OFFSET_5 = Allocate(4)
+			buffer.writeu32(SendBuffer, OFFSET_5, Element_2.Publisher)
+			local Length = #Element_2.Title
+			local OFFSET_6 = Allocate(2)
+			buffer.writeu16(SendBuffer, OFFSET_6, Length)
+			Allocate(Length)
+			buffer.writestring(SendBuffer, SendOffset, Element_2.Title, Length)
+		end
+		buffer.writeu16(SendBuffer, BLOCK_START + 0, Elements_2)
+	end
+	buffer.writeu8(SendBuffer, BLOCK_START + 5, Value.SimBill ~= nil and 1 or 0)
+	if Value.SimBill ~= nil then
+		-- Allocate BLOCK: 2 bytes
+		local BLOCK_START = Allocate(2)
+		local Elements_2 = 0
+		for Key_2, Element_2 in Value.SimBill do
+			Elements_2 += 1
+			local Length = #Key_2
+			local OFFSET_0 = Allocate(2)
+			buffer.writeu16(SendBuffer, OFFSET_0, Length)
+			Allocate(Length)
+			buffer.writestring(SendBuffer, SendOffset, Key_2, Length)
+			local OFFSET_1 = Allocate(1)
+			buffer.writeu8(SendBuffer, OFFSET_1, Element_2.Authenticated and 1 or 0)
+			local Length = #Element_2.Bill.Content
+			local OFFSET_2 = Allocate(2)
+			buffer.writeu16(SendBuffer, OFFSET_2, Length)
+			Allocate(Length)
+			buffer.writestring(SendBuffer, SendOffset, Element_2.Bill.Content, Length)
+			local Length = #Element_2.Bill.Name
+			local OFFSET_3 = Allocate(2)
+			buffer.writeu16(SendBuffer, OFFSET_3, Length)
+			Allocate(Length)
+			buffer.writestring(SendBuffer, SendOffset, Element_2.Bill.Name, Length)
+			-- START ARRAY
+			local OFFSET_4 = Allocate(2)
+			buffer.writeu16(SendBuffer, OFFSET_4, #Element_2.Bill.Prewrittens)
+				-- Allocate BLOCK: 2 bytes
+			local ARRAY_START_3 = Allocate(2 * #Element_2.Bill.Prewrittens)
+			for Index = 1, #Element_2.Bill.Prewrittens do
+				local Item_3 = Element_2.Bill.Prewrittens[Index]
+				local Length = #Item_3
+				-- Allocate 2
+				local OPERATION_OFFSET_0 = ARRAY_START_3
+				ARRAY_START_3 += 2
+				buffer.writeu16(SendBuffer, OPERATION_OFFSET_0, Length)
+				Allocate(Length)
+				buffer.writestring(SendBuffer, SendOffset, Item_3, Length)
+			end
+			-- END ARRAY
+			-- START ARRAY
+			local OFFSET_5 = Allocate(2)
+			buffer.writeu16(SendBuffer, OFFSET_5, #Element_2.Bill.Topics)
+				-- Allocate BLOCK: 2 bytes
+			local ARRAY_START_3 = Allocate(2 * #Element_2.Bill.Topics)
+			for Index = 1, #Element_2.Bill.Topics do
+				local Item_3 = Element_2.Bill.Topics[Index]
+				local Length = #Item_3
+				-- Allocate 2
+				local OPERATION_OFFSET_0 = ARRAY_START_3
+				ARRAY_START_3 += 2
+				buffer.writeu16(SendBuffer, OPERATION_OFFSET_0, Length)
+				Allocate(Length)
+				buffer.writestring(SendBuffer, SendOffset, Item_3, Length)
+			end
+			-- END ARRAY
+			local OFFSET_6 = Allocate(4)
+			buffer.writeu32(SendBuffer, OFFSET_6, Element_2.PublishDate)
+			local OFFSET_7 = Allocate(4)
+			buffer.writeu32(SendBuffer, OFFSET_7, Element_2.Publisher)
+		end
+		buffer.writeu16(SendBuffer, BLOCK_START + 0, Elements_2)
+	end
+end
+
+local function ReadFUNCTION_DATA_CreateUGT(): ({ Title: string, Body: string, Lean: number })
+	-- Read BLOCK: 6 bytes
+	local BLOCK_START = Read(6)
+	local Value = {} :: any
+	local Length = buffer.readu16(RecieveBuffer, BLOCK_START + 0)
+	Value.Title = buffer.readstring(RecieveBuffer, Read(Length), Length)
+	Length = buffer.readu16(RecieveBuffer, BLOCK_START + 2)
+	Value.Body = buffer.readstring(RecieveBuffer, Read(Length), Length)
+	local Encoded = buffer.readu16(RecieveBuffer, BLOCK_START + 4)
+	local MantissaExponent = Encoded % 0x8000
+	if MantissaExponent == 0b0_11111_0000000000  then
+		if Encoded // 0x8000 == 1 then
+			Value.Lean = -math.huge
+		else
+			Value.Lean = math.huge
+		end
+	elseif MantissaExponent == 0b1_11111_0000000000   then
+		Value.Lean = 0 / 0
+	elseif MantissaExponent == 0b0_00000_0000000000   then
+		Value.Lean = 0
+	else
+		local Mantissa = MantissaExponent % 0x400
+		local Exponent = MantissaExponent // 0x400
+		local Fraction;
+		if Exponent == 0 then
+			Fraction = Mantissa / 0x400
+		else
+			Fraction = Mantissa / 0x800 + 0.5
+		end
+		local Result = math.ldexp(Fraction, Exponent - 14)
+		Value.Lean = if Encoded // 0x8000 == 1 then -Result else Result
+	end
+	return Value
+end
+
+local function WriteFUNCTION_RETURN_CreateUGT(Value: { Result: string, Success: boolean }, InvocationIdentifier: number): ()
+	-- Allocate BLOCK: 6 bytes
+	local BLOCK_START = Allocate(6)
+	buffer.writeu8(SendBuffer, BLOCK_START + 0, 6)
+	buffer.writeu8(SendBuffer, BLOCK_START + 1, InvocationIdentifier)
+	buffer.writeu8(SendBuffer, BLOCK_START + 2, 1)
+	local Length = #Value.Result
+	buffer.writeu16(SendBuffer, BLOCK_START + 3, Length)
+	Allocate(Length)
+	buffer.writestring(SendBuffer, SendOffset, Value.Result, Length)
+	buffer.writeu8(SendBuffer, BLOCK_START + 5, Value.Success and 1 or 0)
+end
+
+local function ReadFUNCTION_DATA_Vote(): ({ UGT: boolean, Id: string, Vote: boolean })
+	-- Read BLOCK: 4 bytes
+	local BLOCK_START = Read(4)
+	local Value = {} :: any
+	Value.UGT = (buffer.readu8(RecieveBuffer, BLOCK_START + 0) == 1)
+	local Length = buffer.readu16(RecieveBuffer, BLOCK_START + 1)
+	Value.Id = buffer.readstring(RecieveBuffer, Read(Length), Length)
+	Value.Vote = (buffer.readu8(RecieveBuffer, BLOCK_START + 3) == 1)
+	return Value
+end
+
+local function WriteFUNCTION_RETURN_Vote(Value: { Result: string, Success: boolean }, InvocationIdentifier: number): ()
+	-- Allocate BLOCK: 6 bytes
+	local BLOCK_START = Allocate(6)
+	buffer.writeu8(SendBuffer, BLOCK_START + 0, 7)
+	buffer.writeu8(SendBuffer, BLOCK_START + 1, InvocationIdentifier)
+	buffer.writeu8(SendBuffer, BLOCK_START + 2, 1)
+	local Length = #Value.Result
+	buffer.writeu16(SendBuffer, BLOCK_START + 3, Length)
+	Allocate(Length)
+	buffer.writestring(SendBuffer, SendOffset, Value.Result, Length)
+	buffer.writeu8(SendBuffer, BLOCK_START + 5, Value.Success and 1 or 0)
+end
+
+local function ReadFUNCTION_DATA_RunSim(): ({ Global: boolean, CongressLean: number?, SimulatingBill: { Content: string, Name: string, Prewrittens: { string }, Topics: { string } } })
+	-- Read BLOCK: 10 bytes
+	local BLOCK_START = Read(10)
+	local Value = {} :: any
+	Value.Global = (buffer.readu8(RecieveBuffer, BLOCK_START + 0) == 1)
+	if buffer.readu8(RecieveBuffer, BLOCK_START + 1) == 1 then
+		-- Read BLOCK: 2 bytes
+		local BLOCK_START = Read(2)
+		local Encoded = buffer.readu16(RecieveBuffer, BLOCK_START + 0)
+		local MantissaExponent = Encoded % 0x8000
+		if MantissaExponent == 0b0_11111_0000000000  then
+			if Encoded // 0x8000 == 1 then
+				Value.CongressLean = -math.huge
+			else
+				Value.CongressLean = math.huge
+			end
+		elseif MantissaExponent == 0b1_11111_0000000000   then
+			Value.CongressLean = 0 / 0
+		elseif MantissaExponent == 0b0_00000_0000000000   then
+			Value.CongressLean = 0
+		else
+			local Mantissa = MantissaExponent % 0x400
+			local Exponent = MantissaExponent // 0x400
+			local Fraction;
+			if Exponent == 0 then
+				Fraction = Mantissa / 0x400
+			else
+				Fraction = Mantissa / 0x800 + 0.5
+			end
+			local Result = math.ldexp(Fraction, Exponent - 14)
+			Value.CongressLean = if Encoded // 0x8000 == 1 then -Result else Result
+		end
+	end
+	Value.SimulatingBill = {} :: any
+	local Length = buffer.readu16(RecieveBuffer, BLOCK_START + 2)
+	Value.SimulatingBill.Content = buffer.readstring(RecieveBuffer, Read(Length), Length)
+	Length = buffer.readu16(RecieveBuffer, BLOCK_START + 4)
+	Value.SimulatingBill.Name = buffer.readstring(RecieveBuffer, Read(Length), Length)
+	-- START ARRAY
+	Length = buffer.readu16(RecieveBuffer, BLOCK_START + 6)
+	if Length < 0 then error(`Expected "Length" to be larger than 0, got {Length} instead.`) end
+	if Length > 65535 then error(`Expected "Length" to be smaller than 65535, got {Length} instead.`) end
+	Value.SimulatingBill.Prewrittens = table.create(Length)
+		-- Read BLOCK: 2 bytes
+	local ARRAY_START_1 = Read(2 * Length)
+	for Index = 1, Length do
+		-- Read 2
+		local OPERATION_OFFSET_0 = ARRAY_START_1
+		ARRAY_START_1 += 2
+		Length = buffer.readu16(RecieveBuffer, OPERATION_OFFSET_0)
+		local Item_1 = buffer.readstring(RecieveBuffer, Read(Length), Length)
+		table.insert(Value.SimulatingBill.Prewrittens, Item_1)
+	end
+	-- END ARRAY
+	-- START ARRAY
+	Length = buffer.readu16(RecieveBuffer, BLOCK_START + 8)
+	if Length < 0 then error(`Expected "Length" to be larger than 0, got {Length} instead.`) end
+	if Length > 65535 then error(`Expected "Length" to be smaller than 65535, got {Length} instead.`) end
+	Value.SimulatingBill.Topics = table.create(Length)
+		-- Read BLOCK: 2 bytes
+	local ARRAY_START_1 = Read(2 * Length)
+	for Index = 1, Length do
+		-- Read 2
+		local OPERATION_OFFSET_0 = ARRAY_START_1
+		ARRAY_START_1 += 2
+		Length = buffer.readu16(RecieveBuffer, OPERATION_OFFSET_0)
+		local Item_1 = buffer.readstring(RecieveBuffer, Read(Length), Length)
+		table.insert(Value.SimulatingBill.Topics, Item_1)
+	end
+	-- END ARRAY
+	return Value
+end
+
+local function WriteFUNCTION_RETURN_RunSim(Value: { LawPassed: boolean?, EndOfLaw: ("House Failed" | "Senate Failed" | "Passed")?, HOR: { Passed: boolean, Votes: {[string]: boolean} }?, Senate: { Passed: boolean, Votes: {[string]: boolean} }?, Success: boolean, Result: string }, InvocationIdentifier: number): ()
+	-- Allocate BLOCK: 10 bytes
+	local BLOCK_START = Allocate(10)
+	buffer.writeu8(SendBuffer, BLOCK_START + 0, 8)
+	buffer.writeu8(SendBuffer, BLOCK_START + 1, InvocationIdentifier)
+	buffer.writeu8(SendBuffer, BLOCK_START + 2, 1)
+	buffer.writeu8(SendBuffer, BLOCK_START + 3, Value.LawPassed ~= nil and 1 or 0)
+	if Value.LawPassed ~= nil then
+		-- Allocate BLOCK: 1 bytes
+		local BLOCK_START = Allocate(1)
+		buffer.writeu8(SendBuffer, BLOCK_START + 0, Value.LawPassed and 1 or 0)
+	end
+	buffer.writeu8(SendBuffer, BLOCK_START + 4, Value.EndOfLaw ~= nil and 1 or 0)
+	if Value.EndOfLaw ~= nil then
+		-- Allocate BLOCK: 1 bytes
+		local BLOCK_START = Allocate(1)
+		if Value.EndOfLaw == "House Failed" then
+			buffer.writeu8(SendBuffer, BLOCK_START + 0, 0)
+		elseif Value.EndOfLaw == "Senate Failed" then
+			buffer.writeu8(SendBuffer, BLOCK_START + 0, 1)
+		elseif Value.EndOfLaw == "Passed" then
+			buffer.writeu8(SendBuffer, BLOCK_START + 0, 2)
+		else
+			error(`Unexpected enum: {Value.EndOfLaw}, expected one of "House Failed" or "Senate Failed" or "Passed".`)
+		end
+	end
+	buffer.writeu8(SendBuffer, BLOCK_START + 5, Value.HOR ~= nil and 1 or 0)
+	if Value.HOR ~= nil then
+		-- Allocate BLOCK: 3 bytes
+		local BLOCK_START = Allocate(3)
+		buffer.writeu8(SendBuffer, BLOCK_START + 0, Value.HOR.Passed and 1 or 0)
+		local Elements_2 = 0
+		for Key_2, Element_2 in Value.HOR.Votes do
+			Elements_2 += 1
+			local Length = #Key_2
+			local OFFSET_0 = Allocate(2)
+			buffer.writeu16(SendBuffer, OFFSET_0, Length)
+			Allocate(Length)
+			buffer.writestring(SendBuffer, SendOffset, Key_2, Length)
+			local OFFSET_1 = Allocate(1)
+			buffer.writeu8(SendBuffer, OFFSET_1, Element_2 and 1 or 0)
+		end
+		buffer.writeu16(SendBuffer, BLOCK_START + 1, Elements_2)
+	end
+	buffer.writeu8(SendBuffer, BLOCK_START + 6, Value.Senate ~= nil and 1 or 0)
+	if Value.Senate ~= nil then
+		-- Allocate BLOCK: 3 bytes
+		local BLOCK_START = Allocate(3)
+		buffer.writeu8(SendBuffer, BLOCK_START + 0, Value.Senate.Passed and 1 or 0)
+		local Elements_2 = 0
+		for Key_2, Element_2 in Value.Senate.Votes do
+			Elements_2 += 1
+			local Length = #Key_2
+			local OFFSET_0 = Allocate(2)
+			buffer.writeu16(SendBuffer, OFFSET_0, Length)
+			Allocate(Length)
+			buffer.writestring(SendBuffer, SendOffset, Key_2, Length)
+			local OFFSET_1 = Allocate(1)
+			buffer.writeu8(SendBuffer, OFFSET_1, Element_2 and 1 or 0)
+		end
+		buffer.writeu16(SendBuffer, BLOCK_START + 1, Elements_2)
+	end
+	buffer.writeu8(SendBuffer, BLOCK_START + 7, Value.Success and 1 or 0)
+	local Length = #Value.Result
+	buffer.writeu16(SendBuffer, BLOCK_START + 8, Length)
+	Allocate(Length)
+	buffer.writestring(SendBuffer, SendOffset, Value.Result, Length)
+end
+
 if not RunService:IsRunning() then
 	local NOOP = function() end
 	local Returns = table.freeze({
@@ -384,6 +978,24 @@ if not RunService:IsRunning() then
 		FireExcept = NOOP
 	},
 	FetchEntities = {
+		On = NOOP
+	},
+	StateRequest = {
+		On = NOOP
+	},
+	UpdateState = {
+		Fire = NOOP,
+		FireAll = NOOP,
+		FireList = NOOP,
+		FireExcept = NOOP
+	},
+	CreateUGT = {
+		On = NOOP
+	},
+	Vote = {
+		On = NOOP
+	},
+	RunSim = {
 		On = NOOP
 	},
 	})
@@ -468,6 +1080,55 @@ Reliable.OnServerEvent:Connect(function(Player: Player, Buffer: buffer, Instance
 					warn("[Blink]: Event queue of \"FetchEntities\" exceeded 256, did you forget to implement a listener?")
 				end
 				table.insert(Queue.Reliable[3], {Player, Value, InvocationIdentifier} :: {any})
+			end
+		elseif Index == 4 then
+			local Value: nil = ReadEVENT_StateRequest()
+			if Events.Reliable[4] ~= nil then
+				Events.Reliable[4](Player, Value)
+			else
+				if #Queue.Reliable[4] > 256 then
+					warn("[Blink]: Event queue of \"StateRequest\" exceeded 256, did you forget to implement a listener?")
+				end
+				table.insert(Queue.Reliable[4], {Player, Value} :: {any})
+			end
+		elseif Index == 6 then
+			-- Read BLOCK: 1 bytes
+			local BLOCK_START = Read(1)
+			local InvocationIdentifier = buffer.readu8(RecieveBuffer, BLOCK_START + 0)
+			local Value: { Title: string, Body: string, Lean: number } = ReadFUNCTION_DATA_CreateUGT()
+			if Events.Reliable[6] ~= nil then
+				task.spawn(Events.Reliable[6], Player, Value, InvocationIdentifier)
+			else
+				if #Queue.Reliable[6] > 256 then
+					warn("[Blink]: Event queue of \"CreateUGT\" exceeded 256, did you forget to implement a listener?")
+				end
+				table.insert(Queue.Reliable[6], {Player, Value, InvocationIdentifier} :: {any})
+			end
+		elseif Index == 7 then
+			-- Read BLOCK: 1 bytes
+			local BLOCK_START = Read(1)
+			local InvocationIdentifier = buffer.readu8(RecieveBuffer, BLOCK_START + 0)
+			local Value: { UGT: boolean, Id: string, Vote: boolean } = ReadFUNCTION_DATA_Vote()
+			if Events.Reliable[7] ~= nil then
+				task.spawn(Events.Reliable[7], Player, Value, InvocationIdentifier)
+			else
+				if #Queue.Reliable[7] > 256 then
+					warn("[Blink]: Event queue of \"Vote\" exceeded 256, did you forget to implement a listener?")
+				end
+				table.insert(Queue.Reliable[7], {Player, Value, InvocationIdentifier} :: {any})
+			end
+		elseif Index == 8 then
+			-- Read BLOCK: 1 bytes
+			local BLOCK_START = Read(1)
+			local InvocationIdentifier = buffer.readu8(RecieveBuffer, BLOCK_START + 0)
+			local Value: { Global: boolean, CongressLean: number?, SimulatingBill: { Content: string, Name: string, Prewrittens: { string }, Topics: { string } } } = ReadFUNCTION_DATA_RunSim()
+			if Events.Reliable[8] ~= nil then
+				task.spawn(Events.Reliable[8], Player, Value, InvocationIdentifier)
+			else
+				if #Queue.Reliable[8] > 256 then
+					warn("[Blink]: Event queue of \"RunSim\" exceeded 256, did you forget to implement a listener?")
+				end
+				table.insert(Queue.Reliable[8], {Player, Value, InvocationIdentifier} :: {any})
 			end
 		end
 	end
@@ -633,6 +1294,150 @@ local Returns = table.freeze({
 				Queue.Reliable[3] = nil
 				for Index, Arguments in EventQueue do
 					Events.Reliable[3](table.unpack(Arguments))
+				end
+			end)
+		end
+	},
+	StateRequest = {
+		On = function(Listener: (Player: Player, Value: nil) -> ()): () -> ()
+			Events.Reliable[4] = Listener
+			for Index, Arguments in Queue.Reliable[4] do
+				Listener(table.unpack(Arguments))
+			end
+			Queue.Reliable[4] = {}
+			return function (): ()
+				if Events.Reliable[4] == Listener then
+					Events.Reliable[4] = nil
+				end
+			end
+		end
+	},
+	UpdateState = {
+		Fire = function(Player: Player, Value: { Amendment: { { congress: number, latestAction: { action: string?, text: string? }?, number: string, purpose: string?, type: string, updateDate: string } }?, Bill: { { congress: number, latestAction: { action: string?, text: string? }?, number: string, originalChamber: string?, title: string, type: string, updateDate: string } }?, Members: {[string]: { { bioguideId: string, name: string, partyName: string, state: string, terms: { item: { { chamber: string, startYear: number } } }, updateDate: string } }}?, UGT: {[string]: { Authenticated: boolean, Data: string, Lean: number, PublishDate: number, Publisher: number, Title: string }}?, SimBill: {[string]: { Authenticated: boolean, Bill: { Content: string, Name: string, Prewrittens: { string }, Topics: { string } }, PublishDate: number, Publisher: number }}? }): ()
+			Load(PlayersMap[Player])
+			WriteEVENT_UpdateState(Value)
+			PlayersMap[Player] = Save()
+		end,
+		FireAll = function(Value: { Amendment: { { congress: number, latestAction: { action: string?, text: string? }?, number: string, purpose: string?, type: string, updateDate: string } }?, Bill: { { congress: number, latestAction: { action: string?, text: string? }?, number: string, originalChamber: string?, title: string, type: string, updateDate: string } }?, Members: {[string]: { { bioguideId: string, name: string, partyName: string, state: string, terms: { item: { { chamber: string, startYear: number } } }, updateDate: string } }}?, UGT: {[string]: { Authenticated: boolean, Data: string, Lean: number, PublishDate: number, Publisher: number, Title: string }}?, SimBill: {[string]: { Authenticated: boolean, Bill: { Content: string, Name: string, Prewrittens: { string }, Topics: { string } }, PublishDate: number, Publisher: number }}? }): ()
+			Load()
+			WriteEVENT_UpdateState(Value)
+			local Buffer, Size, Instances = SendBuffer, SendCursor, SendInstances
+			for _, Player in Players:GetPlayers() do
+				Load(PlayersMap[Player])
+				local Position = Allocate(Size)
+				buffer.copy(SendBuffer, Position, Buffer, 0, Size)
+				table.move(Instances, 1, #Instances, #SendInstances + 1, SendInstances)
+				PlayersMap[Player] = Save()
+			end
+		end,
+		FireList = function(List: {Player}, Value: { Amendment: { { congress: number, latestAction: { action: string?, text: string? }?, number: string, purpose: string?, type: string, updateDate: string } }?, Bill: { { congress: number, latestAction: { action: string?, text: string? }?, number: string, originalChamber: string?, title: string, type: string, updateDate: string } }?, Members: {[string]: { { bioguideId: string, name: string, partyName: string, state: string, terms: { item: { { chamber: string, startYear: number } } }, updateDate: string } }}?, UGT: {[string]: { Authenticated: boolean, Data: string, Lean: number, PublishDate: number, Publisher: number, Title: string }}?, SimBill: {[string]: { Authenticated: boolean, Bill: { Content: string, Name: string, Prewrittens: { string }, Topics: { string } }, PublishDate: number, Publisher: number }}? }): ()
+			Load()
+			WriteEVENT_UpdateState(Value)
+			local Buffer, Size, Instances = SendBuffer, SendCursor, SendInstances
+			for _, Player in List do
+				Load(PlayersMap[Player])
+				local Position = Allocate(Size)
+				buffer.copy(SendBuffer, Position, Buffer, 0, Size)
+				table.move(Instances, 1, #Instances, #SendInstances + 1, SendInstances)
+				PlayersMap[Player] = Save()
+			end
+		end,
+		FireExcept = function(Except: Player, Value: { Amendment: { { congress: number, latestAction: { action: string?, text: string? }?, number: string, purpose: string?, type: string, updateDate: string } }?, Bill: { { congress: number, latestAction: { action: string?, text: string? }?, number: string, originalChamber: string?, title: string, type: string, updateDate: string } }?, Members: {[string]: { { bioguideId: string, name: string, partyName: string, state: string, terms: { item: { { chamber: string, startYear: number } } }, updateDate: string } }}?, UGT: {[string]: { Authenticated: boolean, Data: string, Lean: number, PublishDate: number, Publisher: number, Title: string }}?, SimBill: {[string]: { Authenticated: boolean, Bill: { Content: string, Name: string, Prewrittens: { string }, Topics: { string } }, PublishDate: number, Publisher: number }}? }): ()
+			Load()
+			WriteEVENT_UpdateState(Value)
+			local Buffer, Size, Instances = SendBuffer, SendCursor, SendInstances
+			for _, Player in Players:GetPlayers() do
+				if Player == Except then
+					continue
+				end
+				Load(PlayersMap[Player])
+				local Position = Allocate(Size)
+				buffer.copy(SendBuffer, Position, Buffer, 0, Size)
+				table.move(Instances, 1, #Instances, #SendInstances + 1, SendInstances)
+				PlayersMap[Player] = Save()
+			end
+		end,
+	},
+	CreateUGT = {
+		On = function(Listener: (Player, { Title: string, Body: string, Lean: number }) -> ({ Result: string, Success: boolean })): ()
+			Events.Reliable[6] = function(Player: Player, Value: { Title: string, Body: string, Lean: number }, InvocationIdentifier: number): ()
+				local ReturnValue: { Result: string, Success: boolean };
+				local Success, Error = pcall(function ()
+					ReturnValue = Listener(Player, Value)
+				end)
+				Load(PlayersMap[Player])
+				if Success ~= true then
+					local Position = Allocate(3)
+					buffer.writeu8(SendBuffer, Position, 6)
+					buffer.writeu8(SendBuffer, Position + 1, InvocationIdentifier)
+					buffer.writeu8(SendBuffer, Position + 2, 0)
+					warn(`"CreateUGT" encountered an error, {Error}`)
+				else
+					WriteFUNCTION_RETURN_CreateUGT(ReturnValue, InvocationIdentifier)
+				end
+				PlayersMap[Player] = Save()
+			end
+			task.spawn(function (): ()
+				local EventQueue = Queue.Reliable[6] or {}
+				Queue.Reliable[6] = nil
+				for Index, Arguments in EventQueue do
+					Events.Reliable[6](table.unpack(Arguments))
+				end
+			end)
+		end
+	},
+	Vote = {
+		On = function(Listener: (Player, { UGT: boolean, Id: string, Vote: boolean }) -> ({ Result: string, Success: boolean })): ()
+			Events.Reliable[7] = function(Player: Player, Value: { UGT: boolean, Id: string, Vote: boolean }, InvocationIdentifier: number): ()
+				local ReturnValue: { Result: string, Success: boolean };
+				local Success, Error = pcall(function ()
+					ReturnValue = Listener(Player, Value)
+				end)
+				Load(PlayersMap[Player])
+				if Success ~= true then
+					local Position = Allocate(3)
+					buffer.writeu8(SendBuffer, Position, 7)
+					buffer.writeu8(SendBuffer, Position + 1, InvocationIdentifier)
+					buffer.writeu8(SendBuffer, Position + 2, 0)
+					warn(`"Vote" encountered an error, {Error}`)
+				else
+					WriteFUNCTION_RETURN_Vote(ReturnValue, InvocationIdentifier)
+				end
+				PlayersMap[Player] = Save()
+			end
+			task.spawn(function (): ()
+				local EventQueue = Queue.Reliable[7] or {}
+				Queue.Reliable[7] = nil
+				for Index, Arguments in EventQueue do
+					Events.Reliable[7](table.unpack(Arguments))
+				end
+			end)
+		end
+	},
+	RunSim = {
+		On = function(Listener: (Player, { Global: boolean, CongressLean: number?, SimulatingBill: { Content: string, Name: string, Prewrittens: { string }, Topics: { string } } }) -> ({ LawPassed: boolean?, EndOfLaw: ("House Failed" | "Senate Failed" | "Passed")?, HOR: { Passed: boolean, Votes: {[string]: boolean} }?, Senate: { Passed: boolean, Votes: {[string]: boolean} }?, Success: boolean, Result: string })): ()
+			Events.Reliable[8] = function(Player: Player, Value: { Global: boolean, CongressLean: number?, SimulatingBill: { Content: string, Name: string, Prewrittens: { string }, Topics: { string } } }, InvocationIdentifier: number): ()
+				local ReturnValue: { LawPassed: boolean?, EndOfLaw: ("House Failed" | "Senate Failed" | "Passed")?, HOR: { Passed: boolean, Votes: {[string]: boolean} }?, Senate: { Passed: boolean, Votes: {[string]: boolean} }?, Success: boolean, Result: string };
+				local Success, Error = pcall(function ()
+					ReturnValue = Listener(Player, Value)
+				end)
+				Load(PlayersMap[Player])
+				if Success ~= true then
+					local Position = Allocate(3)
+					buffer.writeu8(SendBuffer, Position, 8)
+					buffer.writeu8(SendBuffer, Position + 1, InvocationIdentifier)
+					buffer.writeu8(SendBuffer, Position + 2, 0)
+					warn(`"RunSim" encountered an error, {Error}`)
+				else
+					WriteFUNCTION_RETURN_RunSim(ReturnValue, InvocationIdentifier)
+				end
+				PlayersMap[Player] = Save()
+			end
+			task.spawn(function (): ()
+				local EventQueue = Queue.Reliable[8] or {}
+				Queue.Reliable[8] = nil
+				for Index, Arguments in EventQueue do
+					Events.Reliable[8](table.unpack(Arguments))
 				end
 			end)
 		end

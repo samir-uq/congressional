@@ -62,3 +62,150 @@ function FetchEntities {
     Yield: Coroutine,
     Return: map {[u8]: EntityData}
 }
+
+
+
+struct Bill {
+    congress: u32,
+    latestAction: struct {
+        action: string?,
+        text: string?
+    }?,
+    number: string,
+    originalChamber: string?,
+    title: string,
+    type: string,
+    updateDate: string,
+}
+
+struct Amendment {
+    congress: u32,
+    latestAction: struct {
+        action: string?,
+        text: string?
+    }?,
+    number: string,
+    purpose: string?,
+    type: string,
+    updateDate: string,
+}
+
+struct Member {
+    bioguideId: string,
+    name: string,
+    partyName: string,
+    state: string,
+    terms: struct {
+        item: struct {
+            chamber: string,
+            startYear: u16,
+        }[]
+    },
+    updateDate: string
+}
+
+struct UGT {
+    Authenticated: boolean,
+    Data: string,
+    Lean: f16,
+    PublishDate: u32,
+    Publisher: u32,
+    Title: string
+}
+
+struct SimBillCore {
+    Content: string,
+    Name: string,
+    Prewrittens: string[],
+    Topics: string[]
+}
+
+struct SimBill {
+    Authenticated: boolean,
+    Bill: SimBillCore,
+    PublishDate: u32,
+    Publisher: u32,
+}
+
+struct SimPassData {
+    Passed: boolean,
+    Votes: map {[string]: boolean}
+}
+
+struct InteractionRes {
+    -- Interaction: enum {
+    --     GlobalVote,
+    --     UGTVote,
+    --     GlobalSim,
+    --     UGTCreate
+    -- },
+
+    Result: string,
+    Success: boolean
+}
+
+
+event StateRequest {
+    from: Client,
+    type: Reliable,
+    call: SingleSync,
+    -- data: struct {}
+}
+
+event UpdateState {
+    from: Server,
+    type: Reliable,
+    call: SingleSync,
+    data: struct {
+        Amendment: Amendment[]?,
+        Bill: Bill[]?,
+        Members: map {[string]: Member[]}?,
+        UGT: map {[string]: UGT}?,
+        SimBill: map{[string]: SimBill}?,
+    }
+}
+
+
+function CreateUGT {
+    yield: Coroutine,
+    data: struct {
+        Title: string,
+        Body: string,
+        Lean: f16
+    },
+    return: InteractionRes
+}
+
+function Vote {
+    yield: Coroutine,
+    data: struct {
+        UGT: boolean,
+        Id: string,
+        Vote: boolean,
+    },
+    return: InteractionRes,
+}
+
+function RunSim {
+    yield: Coroutine,
+    data: struct {
+        Global: boolean,
+        CongressLean: f16?,
+        SimulatingBill: SimBillCore,
+    },
+    return: struct {
+        LawPassed: boolean?,
+        EndOfLaw: enum {
+            "House Failed",
+            "Senate Failed",
+            "Passed"
+        }?,
+
+        HOR: SimPassData?,
+        Senate: SimPassData?,
+
+
+        Success: boolean,
+        Result: string
+    },
+}

@@ -138,5 +138,125 @@ export type BindData = {
 	Callback: (InputObject) -> (),
 }
 
+export type RobaseRequest = {
+	pagination: {
+		count: number,
+		next: string,
+	},
+	request: {
+		contentType: string,
+		format: string
+	}
+}
+
+export type Amendment = {
+	congress: number,
+	latestAction: {
+		actionDate: string,
+		text: string,
+	},
+	number: string,
+	purpose: string,
+	type: string,
+	updateDate: string,
+	url: string,
+}
+
+export type Bill = {
+	congress: number,
+	latestAction: {
+		actionDate: string,
+		text: string,
+	},
+	number: string,
+	originalChamber: string,
+	title: string,
+	type: string,
+	updateDate: string,
+	updateDateIncludingText: string?,
+	url: string?,
+}
+
+export type Member = {
+	bioguideId: string,
+	depiction: {
+		attribution: string,
+		imageUrl: string,
+	}?,
+	name: string,
+	partyName: string,
+	state: string,
+	terms: {
+		item: {
+			{
+				chamber: string,
+				startYear: number
+			}
+		}
+	},
+	updateDate: string,
+	url: string?,
+}
+
+export type UGT = {
+	Authenticated: boolean,
+	Data: string,
+	Lean: number,
+	PublishDate: number,
+	Publisher: number,
+	Title: string,
+}
+
+export type SimBillCore = {
+	Content: string,
+	Name: string,
+	Prewrittens: {string},
+	Topics: {string}
+}
+
+export type SimBill = {
+	Authenticated: boolean,
+	Bill: SimBillCore,
+	PublishDate: number,
+	Publisher: number,
+}
+
+export type AmendmentRequest = RobaseRequest&{
+	amendments: {Amendment}
+}
+export type BillRequest = RobaseRequest&{
+	bills: {Bill}
+}
+export type MemberRequest = RobaseRequest&{
+	members: {Member}
+}
+
+export type UGTList = {[string]: UGT}
+export type SimBillList = {[string]: UGT}
+
+
+export type SimPassData = {
+	Passed: boolean,
+	Votes: {[string]: boolean}
+}
+
+export type SimRes = {
+	EndOfLaw: "House Failed"| "Senate Failed"| "Passed"?,
+	HOR: SimPassData?,
+	Senate: SimPassData?,
+
+	Success: boolean,
+	Result: string,
+}
+
+--  LawPassed: boolean?,
+--         EndOfLaw: enum {
+--             "House Failed",
+--             "Senate Failed",
+--             "Passed"
+--         }?,
+
+--         HOR: SimPassData?,
+--         Senate: SimPassData?,
 
 return {}
