@@ -16,16 +16,19 @@ return function (scope: scope, props: {
     transparency: state<number>?,
     color: state<Color3>?,
     automaticSize: state<Enum.AutomaticSize>?,
+    sizeConstraint: state<Enum.SizeConstraint>?,
+    canvasFrame: boolean?,
 })
     local scope = scope:innerScope()
     local text = scope:Value("Text")
 
-    return scope:New "Frame" {
+    return scope:New (props.canvasFrame and "CanvasGroup" or "Frame") {
         AnchorPoint = props.anchorPoint or UIConfiguration.default.anchorPoint,
         Size = props.size or UIConfiguration.default.size,
         Position = props.position or UIConfiguration.default.position,
         BackgroundTransparency = props.transparency or 1,
         BackgroundColor3 = props.color,
+        SizeConstraint =  props.sizeConstraint,
         AutomaticSize = scope:Computed(function(use)
             local current = use(props.automaticSize)
             return current or Enum.AutomaticSize.None

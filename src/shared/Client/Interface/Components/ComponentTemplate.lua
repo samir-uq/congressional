@@ -1,4 +1,3 @@
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Fusion = require(ReplicatedStorage.Packages.Fusion)
 
@@ -13,8 +12,8 @@ local Dependency = {
 
 type scope = Fusion.Scope<typeof(Fusion) & typeof(Dependency)>
 type state<T> = Fusion.UsedAs<T>
-return function (props: {
-    scope: scope,
+return function (scope: any, props: {
+
 })
-    local scope = props.scope:innerScope()
+    local scope: scope = scope:innerScope(Dependency)
 end

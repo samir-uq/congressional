@@ -10,7 +10,7 @@ local Children = Fusion.Children
 local OnEvent = Fusion.OnEvent
 local Child = Fusion.Child
 
-type scope = Fusion.Scope<typeof(Fusion)>
+type scope = Fusion.Scope<typeof(Fusion) & {Container: typeof(Container)}>
 type state<T> = Fusion.UsedAs<T>
 return function (scope: scope, props: {
     size: state<UDim2>?,
@@ -33,9 +33,11 @@ return function (scope: scope, props: {
     
     onClick: (()->())?,
 })
-    local scope = scope:innerScope()
+    local scope = scope:innerScope({
+        Container = Container
+    })
 
-    local hovering = scope:Value(false)
+    local hovering = (props.hovering :: any) or scope:Value(false)
     local clicking = scope:Value(false)
 
     local scale = scope:Computed(function(use)
@@ -81,7 +83,10 @@ return function (scope: scope, props: {
     local posSpring = scope:Spring(pos, StateData.GetSpring("buttonPosition"), StateData.GetDamp("buttonPosition"))
     local colorSpring = scope:Spring(props.color, StateData.GetSpring("buttonColor"), StateData.GetDamp("buttonColor"))
 
-    return scope:Hydrate(Container(scope, props)) {
+    local edited: any = table.clone(props)
+    edited.color = nil
+    edited.transparency = 1
+    return scope:Hydrate(scope:Container(edited :: any) :: any) {
         [Children] = {
             scope:New "ImageButton" {
                 AnchorPoint = anchorSpring,

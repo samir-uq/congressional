@@ -19,4 +19,17 @@ return {
     redTwo = Color3.fromRGB(191, 49, 49),
 
     vanillaOne = Color3.fromRGB(234, 209, 150),
+
+    colorRotation = {
+        Color3.fromRGB(141, 116, 99),
+        Color3.fromRGB(173, 104, 106),
+        Color3.fromRGB(157, 105, 171),
+        Color3.fromRGB(122, 113, 165),
+        Color3.fromRGB(85, 115, 174),
+        Color3.fromRGB(68, 138, 157),
+        Color3.fromRGB(54, 89, 155),
+        Color3.fromRGB(72, 143, 94),
+        Color3.fromRGB(176, 152, 86),
+        Color3.fromRGB(168, 86, 86),
+    }
 }

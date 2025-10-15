@@ -8,16 +8,20 @@ local Children = Fusion.Children
 type scope = Fusion.Scope<typeof(Fusion)>
 type state<T> = Fusion.UsedAs<T>
 
-local function delayValue<T>(input: state<T>, scope: scope, delayTime: number): state<T>
+local function delayValue<T>(input: state<T>, scope: scope, delayTime: state<number>): state<T>
     local delayed = scope:Value(peek(input))
     local setValue: thread? = nil
+
+    -- if delayTime <= 0 then
+    --   return input
+    -- end
   
     scope:Observer(input):onChange(function()
       if setValue then
         task.cancel(setValue)
       end
       
-      setValue = task.delay(delayTime, function()
+      setValue = task.delay(peek(delayTime), function()
         delayed:set(peek(input))
         setValue = nil
       end)
