@@ -36,6 +36,17 @@ function Interface.Create(scope: scope, props: {
         size = UDim2.fromScale(1,1)
     }) {
         [Children] = Child {
+           scope:Hydrate( scope:Text {
+            disableShadow = true,
+            color = Color3.new(1,1,1),
+            text = "Congress Game",
+            size = UDim2.fromScale(1, 0.1),
+            position = UDim2.fromScale(0.5, 0.4),
+            textSize = 100,
+            anchorPoint = Vector2.new(0.5, 0.5),
+        }) {
+            Visible = props.visible
+        },
             scope:Hydrate(scope:Container {
                 size = UDim2.fromScale(0.8, 0.4),
                 anchorPoint = Vector2.new(0.5, 1),

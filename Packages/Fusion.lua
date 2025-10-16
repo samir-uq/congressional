@@ -1,4 +1,5 @@
-local REQUIRED_MODULE = require(script.Parent._Index["elttob_fusion@0.3.0"]["fusion"])
+local REQUIRED_MODULE = require(script.Parent._Index["plainsour_lemon@0.4.0-dev.1.4"]["lemon"])
+export type Fusion = REQUIRED_MODULE.Fusion 
 export type Animatable = REQUIRED_MODULE.Animatable 
 export type UsedAs<T> = REQUIRED_MODULE.UsedAs<T>
 export type Child = REQUIRED_MODULE.Child 
@@ -13,7 +14,7 @@ export type ScopedObject = REQUIRED_MODULE.ScopedObject
 export type SpecialKey = REQUIRED_MODULE.SpecialKey 
 export type Spring<T> = REQUIRED_MODULE.Spring<T>
 export type StateObject<T> = REQUIRED_MODULE.StateObject<T>
-export type Task = REQUIRED_MODULE.Task 
+export type Chore = REQUIRED_MODULE.Chore 
 export type Tween<T> = REQUIRED_MODULE.Tween<T>
 export type Use = REQUIRED_MODULE.Use 
 export type Value<T, S = T> = REQUIRED_MODULE.Value<T, S >

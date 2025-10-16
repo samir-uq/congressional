@@ -41,6 +41,7 @@ local function HandleData()
                 end
                 table.insert(AmendmentCache, Amendment)
             end
+            AmendmentUpdated:Fire()
         end
 
         if Data.Bill then
@@ -55,6 +56,7 @@ local function HandleData()
                 end
                 table.insert(BillsCache, Bill)
             end
+            BillsUpdated:Fire()
         end
 
         if Data.Members then
@@ -72,18 +74,21 @@ local function HandleData()
                     table.insert(MembersCache[State], Member)
                 end
             end
+            MembersUpdated:Fire()
         end
 
         if Data.UGT then
             for Key, UGT in Data.UGT do
                 UGTCache[Key] = UGT
             end
+            UGTUpdated:Fire()
         end
 
         if Data.SimBill then
             for Key, SimBill: any in Data.SimBill do
                 SimBillCache[Key] = SimBill
             end
+            SimBillUpdated:Fire()
         end
     end)
 end
@@ -95,6 +100,16 @@ function StateData.Get()
         UGT = UGTCache,
         Members = MembersCache,
         SimBill = SimBillCache
+    }
+end
+
+function StateData.GetSignals() 
+    return {
+        SimBill = SimBillUpdated,
+        UGT = UGTUpdated,
+        Members = MembersUpdated,
+        Bill = BillsUpdated,
+        Amendment = AmendmentUpdated,
     }
 end
 

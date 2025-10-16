@@ -9,6 +9,8 @@ return {
         backgroundColor3 = Color3.fromRGB(255,255,255),
     },
 
+    statsSize = 200,
+
     button = {
         animationPos = {
             bottom = {

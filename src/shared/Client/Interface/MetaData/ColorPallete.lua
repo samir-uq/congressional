@@ -20,6 +20,10 @@ return {
 
     vanillaOne = Color3.fromRGB(234, 209, 150),
 
+    Republican = Color3.fromRGB(222, 1, 0),
+    Democratic = Color3.fromRGB(20, 5, 189),
+    Independent = Color3.fromRGB(105, 211, 82),
+
     colorRotation = {
         Color3.fromRGB(141, 116, 99),
         Color3.fromRGB(173, 104, 106),

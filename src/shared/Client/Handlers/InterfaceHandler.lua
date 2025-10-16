@@ -2,7 +2,9 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Fusion = require(ReplicatedStorage.Packages.Fusion)
 local BackgroundFrame = require(ReplicatedStorage.Shared.Client.Handlers.Interface.BackgroundFrame)
+local HORDisplayFrame = require(ReplicatedStorage.Shared.Client.Handlers.Interface.HORDisplayFrame)
 local MainOptionScreen = require(ReplicatedStorage.Shared.Client.Handlers.Interface.MainOptionScreen)
+local SenateDisplayFrame = require(ReplicatedStorage.Shared.Client.Handlers.Interface.SenateDisplayFrame)
 local Background = require(ReplicatedStorage.Shared.Client.Interface.Components.Congress.Background)
 local Button = require(ReplicatedStorage.Shared.Client.Interface.Components.Default.Button)
 local Container = require(ReplicatedStorage.Shared.Client.Interface.Components.Default.Container)
@@ -19,7 +21,9 @@ local Child = Fusion.Child
 
 local Dependency = {
     Background = BackgroundFrame.Create,
-    MainOptionScreen = MainOptionScreen.Create
+    MainOptionScreen = MainOptionScreen.Create,
+    SenateDisplayFrame = SenateDisplayFrame.Create,
+    HORDisplayFrame = HORDisplayFrame.Create
 }
 
 type scope = Fusion.Scope<typeof(Fusion) & typeof(Dependency)>
@@ -38,6 +42,21 @@ function Interface.Start()
             scope:MainOptionScreen {
                 visible = scope:Computed(function(use)
                     return use(visible) == "Menu"
+                end),
+                currentFrame = visible,
+            },
+
+            scope:SenateDisplayFrame {
+                visible = scope:Computed(function(use)
+                    return use(visible) == "View Senate"
+                end),
+                currentFrame = visible,
+
+            },
+
+            scope:HORDisplayFrame {
+                visible = scope:Computed(function(use)
+                    return use(visible) == "View HOR"
                 end),
                 currentFrame = visible,
             }
