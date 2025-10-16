@@ -35,13 +35,13 @@ local Story: UiLabs.FusionStory = {
     fusion = Fusion,
     controls = Controls,
     story = function(props: UiLabs.FusionProps)
-        local scope = props.scope:innerScope(Dependency) :: Fusion.Scope<typeof(Fusion)&typeof(Dependency)>
+        local scope: any = props.scope:innerScope(Dependency) :: Fusion.Scope<typeof(Fusion)&typeof(Dependency)>
         local controls = props.controls
 
         return scope:Hydrate(scope:Container {
             size = UDim2.fromScale(1/2,1/2),
         }) {
-            [Children] =  {
+            [Children] =  Child {
                 scope:InfoDisplayCircle {
                     visible = controls.visible,
                     color = controls.color,
