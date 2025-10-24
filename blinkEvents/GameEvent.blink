@@ -116,7 +116,7 @@ struct UGT {
 struct SimBillCore {
     Content: string,
     Name: string,
-    Prewrittens: string[],
+    Prewrittens: string[]?,
     Topics: string[]
 }
 

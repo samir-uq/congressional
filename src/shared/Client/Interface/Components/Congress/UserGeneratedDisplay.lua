@@ -2,7 +2,6 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Fusion = require(ReplicatedStorage.Packages.Fusion)
 local SimulationActions = require(ReplicatedStorage.Shared.Client.Handlers.SimulationActions)
-local StateDataManager = require(ReplicatedStorage.Shared.Client.Handlers.StateDataManager)
 local Button = require(ReplicatedStorage.Shared.Client.Interface.Components.Default.Button)
 local Container = require(ReplicatedStorage.Shared.Client.Interface.Components.Default.Container)
 local Layout = require(ReplicatedStorage.Shared.Client.Interface.Components.Default.Layout)
@@ -30,9 +29,9 @@ return function (scope: any, props: {
     title: state<string>,
     publisher: state<number>,
     publishDate: state<number>,
+    lean: state<number>,
     content: state<string>,
     authenticated: state<boolean>,
-    prewritterns: state<string>,
     id: state<string>,
 })
     local scope: scope = scope:innerScope(Dependency)
@@ -45,7 +44,7 @@ return function (scope: any, props: {
         anchorPoint = Vector2.new(0, 0.5),
         roundness = 0.1,
         onClick = function()
-            SimulationActions.Vote(false, peek(props.id), true)
+            SimulationActions.Vote(true, peek(props.id), true)
         end
     }
 
@@ -57,7 +56,7 @@ return function (scope: any, props: {
         anchorPoint = Vector2.new(1, 0.5),
         roundness = 0.1,
         onClick = function()
-           SimulationActions.Vote(false, peek(props.id), false)
+           SimulationActions.Vote(true, peek(props.id), false)
         end
     }
 
@@ -134,24 +133,62 @@ return function (scope: any, props: {
                         color = ColorPallete.greySeven,
                     },
 
+                    scope:ProgressBar {
+                        size = UDim2.fromScale(0.5, 0.1),
+                        percentage = scope:Computed(function(use)
+                            local lean: number = use(props.lean) or 0
+                            return math.abs(lean)
+                        end),
+                        direction = "center-side",
+                        children = scope:Hydrate(scope:Container {
+                            size = UDim2.fromScale(1,1)
+                        }) {
+                            [Children] = Child {
+                                scope:Hydrate(scope:Container {
+                                    size = UDim2.fromScale(1, 1),
+                                    color = ColorPallete.Democratic,
+                                    transparency = scope:Computed(function(use)
+                                        if use(props.lean) < 0 then return 0 else return 1 end
+                                    end)
+                                }) {
+                                    [Children] = Child {
+                                        scope:New "UICorner" {
+                                            CornerRadius = UDim.new(1),
+                                        }
+                                    }
+                                },
+
+                                scope:Hydrate(scope:Container {
+                                    size = UDim2.fromScale(1, 1),
+                                    color = ColorPallete.Republican,
+                                    transparency = scope:Computed(function(use)
+                                        if use(props.lean) >= 0 then return 0 else return 1 end
+                                    end)
+                                }) {
+                                    [Children] = Child {
+                                        scope:New "UICorner" {
+                                            CornerRadius = UDim.new(1),
+                                        }
+                                    }
+                                },
+
+                                scope:Text {
+                                    disableShadow = true,
+                                    text = scope:Computed(function(use)
+                                        return "Lean: " .. math.round(use(props.lean)::number*1000)/1000
+                                    end),
+                                    size = UDim2.fromScale(0.3,0.5),
+                                    alignmentX = Enum.TextXAlignment.Center,
+                                    color = Color3.new(1,1,1)
+                                },
+                            }
+                        }
+                    } :: any,
 
                     scope:Text {
                         disableShadow = true,
-                        text = scope:Computed(function(use)
-                            local mainContent: string = use(props.content)
-                            local prewritterns: {string} = use(props.prewritterns) or {}
-
-                            local final = mainContent
-                            for _, prewrittenId: string in prewritterns do
-                                local exists = StateDataManager.Get().UGT[prewrittenId]
-                                if exists then
-                                    final = final .. "\n\n" .. exists.Data
-                                end
-                            end
-
-                            return final
-                        end),
-                        size = UDim2.fromScale(0.9, 0.6125),
+                        text = props.content,
+                        size = UDim2.fromScale(0.9, 0.5125),
                         alignmentX = Enum.TextXAlignment.Left,
                         alignmentY = Enum.TextYAlignment.Top,
                         textSize = 20,
@@ -163,9 +200,9 @@ return function (scope: any, props: {
                         text = scope:Computed(function(use)
                             local authenticated = use(props.authenticated)
                             if authenticated then
-                                return "Bill has been authenticated"
+                                return "Topic has been authenticated"
                             end
-                            return "Bill has not been authenticated"
+                            return "Topic has not been authenticated"
                         end),
                         size = UDim2.fromScale(0.9, 0.05),
                         alignmentX = Enum.TextXAlignment.Left,

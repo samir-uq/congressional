@@ -39,7 +39,7 @@ function Interface.Create(scope: scope, props: {
             scope:Hydrate( scope:Text {
                 disableShadow = true,
                 color = Color3.new(1,1,1),
-                text = "Global Interface",
+                text = "Simulated Interface",
                 size = UDim2.fromScale(1, 0.1),
                 position = UDim2.fromScale(0.5, 0.3),
                 textSize = 100,
@@ -66,7 +66,7 @@ function Interface.Create(scope: scope, props: {
                         visible = props.visible,
                         content = scope:Computed(function(use)
                             local buttons = {}
-                            for _, item in {"View Simulated Bills", "View User Generated"} do --"View Amendments", "View Bills", 
+                            for _, item in {"Create Sim Bill", "Create Global  Bill", "Create UGT"} do --"View Amendments", "View Bills", 
                                 local buttonComponent = scope:Button {
                                     roundness = 0.2,
                                     color = ColorPallete.whiteTwo,

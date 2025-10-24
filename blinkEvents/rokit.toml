@@ -4,4 +4,3 @@
 # New tools can be added by running `rokit add <tool>` in a terminal.
 
 [tools]
-blink = "1Axen/blink@0.18.4"

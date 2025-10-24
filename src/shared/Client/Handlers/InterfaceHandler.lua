@@ -2,9 +2,12 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Fusion = require(ReplicatedStorage.Packages.Fusion)
 local BackgroundFrame = require(ReplicatedStorage.Shared.Client.Handlers.Interface.BackgroundFrame)
+local GlobalDisplayOptionScreen = require(ReplicatedStorage.Shared.Client.Handlers.Interface.GlobalDisplayOptionScreen)
 local HORDisplayFrame = require(ReplicatedStorage.Shared.Client.Handlers.Interface.HORDisplayFrame)
 local MainOptionScreen = require(ReplicatedStorage.Shared.Client.Handlers.Interface.MainOptionScreen)
 local SenateDisplayFrame = require(ReplicatedStorage.Shared.Client.Handlers.Interface.SenateDisplayFrame)
+local SimulatedBillScreen = require(ReplicatedStorage.Shared.Client.Handlers.Interface.SimulatedBillScreen)
+local UGTScreen = require(ReplicatedStorage.Shared.Client.Handlers.Interface.UGTScreen)
 local Background = require(ReplicatedStorage.Shared.Client.Interface.Components.Congress.Background)
 local Button = require(ReplicatedStorage.Shared.Client.Interface.Components.Default.Button)
 local Container = require(ReplicatedStorage.Shared.Client.Interface.Components.Default.Container)
@@ -23,7 +26,10 @@ local Dependency = {
     Background = BackgroundFrame.Create,
     MainOptionScreen = MainOptionScreen.Create,
     SenateDisplayFrame = SenateDisplayFrame.Create,
-    HORDisplayFrame = HORDisplayFrame.Create
+    HORDisplayFrame = HORDisplayFrame.Create,
+    GlobalDisplayOptionScreen = GlobalDisplayOptionScreen.Create,
+    SimulatedBillScreen = SimulatedBillScreen.Create,
+    UGTScreen = UGTScreen.Create
 }
 
 type scope = Fusion.Scope<typeof(Fusion) & typeof(Dependency)>
@@ -57,6 +63,27 @@ function Interface.Start()
             scope:HORDisplayFrame {
                 visible = scope:Computed(function(use)
                     return use(visible) == "View HOR"
+                end),
+                currentFrame = visible,
+            },
+
+            scope:GlobalDisplayOptionScreen {
+                visible = scope:Computed(function(use)
+                    return use(visible) == "Global"
+                end),
+                currentFrame = visible,
+            },
+
+            scope:SimulatedBillScreen {
+                visible = scope:Computed(function(use)
+                    return use(visible) == "View Simulated Bills"
+                end),
+                currentFrame = visible,
+            },
+
+            scope:UGTScreen {
+                visible = scope:Computed(function(use)
+                    return use(visible) == "View User Generated"
                 end),
                 currentFrame = visible,
             }

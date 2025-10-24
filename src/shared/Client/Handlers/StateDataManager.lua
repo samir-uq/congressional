@@ -1,7 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Signal = require(ReplicatedStorage.Packages.Signal)
 local GameTypes = require(ReplicatedStorage.Shared.Configs.GameTypes)
-local ClientEvent = require(ReplicatedStorage.Shared.Event.ClientEvent)
 
 
 local StateData = {}
@@ -28,6 +27,7 @@ local function GetHash<A,B,C,D>(Items:{[C]:D},Processor: ((C,D)->(A,B))): {[A]: 
 end
 
 local function HandleData()
+    local ClientEvent = require(ReplicatedStorage.Shared.Event.ClientEvent)
     ClientEvent.UpdateState.On(function(Data)
         if Data.Amendment then
             local Hash = GetHash(AmendmentCache, function(Key, Val)
@@ -115,6 +115,7 @@ end
 
 function StateData.Start()
     HandleData()
+    local ClientEvent = require(ReplicatedStorage.Shared.Event.ClientEvent)
     ClientEvent.StateRequest.Fire()
 end
 

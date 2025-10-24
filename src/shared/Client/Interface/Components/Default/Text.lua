@@ -23,12 +23,19 @@ return function (scope: scope, props: {
     disableShadow: state<boolean>?,
     shadowOffset: state<UDim2>?,
     automaticSize: state<Enum.AutomaticSize>?,
+    alignmentX: state<Enum.TextXAlignment>?,
+    alignmentY: state<Enum.TextYAlignment>?,
+
+    borderColor: state<Color3>?,
+    borderPixel: state<number>?,
+
+    wrapped: state<boolean>?,
 })
     local scope = scope:innerScope()
 
     return scope:Hydrate(Container(scope, props :: any)) {
         [Children] = Child {
-            scope:Computed(function(use): Instance?
+            scope:Computed(function(use, scope: scope): Instance?
                 local shadowEnabled: boolean =  not use(props.disableShadow or false)
                 
                 if shadowEnabled then
@@ -40,12 +47,20 @@ return function (scope: scope, props: {
                         BackgroundTransparency = 1,
                         FontFace = UIConfiguration.default.primaryFont,
                         RichText = true,
+                        TextWrap = true,
+                        AutomaticSize =  props.automaticSize,
             
             
                         TextScaled = (props.textSize == nil and true or false),
                         TextSize = props.textSize,
                         Text = props.text,
                         TextColor3 = props.accentColor,
+                        TextXAlignment =  props.alignmentX,
+                        TextYAlignment = props.alignmentY,
+                        TextWrapped = props.wrapped,
+
+                        BorderSizePixel =  props.borderPixel,
+                        BorderColor3 = props.borderColor,
                     }
                    end
                return nil
@@ -59,12 +74,22 @@ return function (scope: scope, props: {
                 BackgroundTransparency = 1,
                 FontFace = UIConfiguration.default.primaryFont,
                 RichText = true,
+                TextWrap = true,
+                AutomaticSize = props.automaticSize,
+                Name = "Main",
 
 
                 TextScaled = (props.textSize == nil and true or false),
                 TextSize = props.textSize,
                 Text = props.text,
                 TextColor3 = props.color,
+                TextXAlignment =  props.alignmentX,
+                TextYAlignment = props.alignmentY,
+
+                TextWrapped = props.wrapped,
+
+                BorderSizePixel =  props.borderPixel,
+                BorderColor3 = props.borderColor,
             },
         }
     }

@@ -287,11 +287,11 @@ end
 function Sim.Start()
     ServerEvent.RunSim.On(function(Player: Player, Data): any
         if Data.Global then
-            local Success, Result = Sim.CreateGlobal(Player, Data.SimulatingBill)
+            local Success, Result = Sim.CreateGlobal(Player, Data.SimulatingBill :: any)
             return {Success = Success, Result = Result}
         end
 
-        local _, SimResult = Sim.GetSimulatedResults(Data.SimulatingBill, Data.CongressLean or 0)
+        local _, SimResult = Sim.GetSimulatedResults(Data.SimulatingBill :: any, Data.CongressLean or 0)
 		SimResult.Success = true
 		SimResult.Result = "Simulated Bill"
         return SimResult

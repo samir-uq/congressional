@@ -85,7 +85,7 @@ return function (scope: any, props: {
 
                     size = seatScope:Computed(function(use)
                         local a = use(absoluteSize)
-                        return UDim2.fromScale(seatDiam / a.X, seatDiam / a.Y)
+                        return UDim2.fromScale(seatDiam *.9 / a.X, seatDiam * .9 / a.Y)
                     end),
 
                     position = seatScope:Computed(function(use)
