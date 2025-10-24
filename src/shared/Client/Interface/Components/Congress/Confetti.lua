@@ -100,8 +100,7 @@ local Dependency = {
 
 type scope = Fusion.Scope<typeof(Fusion) & typeof(Dependency)>
 type state<T> = Fusion.UsedAs<T>
-return function (props: {
-    scope: scope,
+return function (scope: scope, props: {
     ConfettiCount: number, 
     MaxSpringSpeed: number?, 
     WaitForEach: number?, 
@@ -111,7 +110,7 @@ return function (props: {
     ConfettiMaxSize: Vector2?, 
     ColorRange: {Color3}?
 })
-    local scope = props.scope:innerScope()
+    local scope = scope:innerScope()
 
 
     local Length = (props.MaxSpringSpeed and math.round(3.5/props.MaxSpringSpeed)+1) or 3
@@ -119,12 +118,16 @@ return function (props: {
 	local MinSize = Vector2.new(props.ConfettiMinSize and props.ConfettiMinSize.X or 5, props.ConfettiMinSize and props.ConfettiMinSize.Y or 5)
 	local MaxSize = Vector2.new(props.ConfettiMaxSize and props.ConfettiMaxSize.X or 12, props.ConfettiMaxSize and props.ConfettiMaxSize.Y or 20)
 
-	local MinPos = Vector2.new(props.MaxLeft and props.MaxLeft or 0.35 -0.4)
-	local MaxPos = Vector2.new(props.MaxRight and props.MaxRight or 0.65 ,-0.2)
+	local MinPos = Vector2.new(props.MaxLeft and props.MaxLeft or 0, -0.4)
+	local MaxPos = Vector2.new(props.MaxRight and props.MaxRight or 1 ,-0.2)
 
 	local RandomSeed = Random.new()
 
     local NewCanvas
+    local emptyTable = {}
+    for x = 1, peek(props.ConfettiCount) or 80 do
+        table.insert(emptyTable, true)
+    end
     NewCanvas = scope:New "ScreenGui" {
         ResetOnSpawn = false,
         DisplayOrder = 100,
@@ -132,7 +135,7 @@ return function (props: {
         ScreenInsets = Enum.ScreenInsets.None,
         Parent = Players.LocalPlayer.PlayerGui,
         [Children] = Child {
-            scope:ForKeys(table.create(props.ConfettiCount or 80), function(use, scope: scope, index: number)
+            scope:ForPairs(emptyTable, function(use, scope: scope, index: number, value: boolean)
                 local FinalPos = UDim2.fromScale(RandomSeed:NextNumber(MinPos.X, MaxPos.X), RandomSeed:NextNumber(MinPos.Y, MaxPos.Y))
 
 		        local Scale, Rot, Pos = scope:Value(0), scope:Value(0), scope:Value(UDim2.fromScale(FinalPos.X.Scale + RandomSeed:NextNumber(-0.15, 0.15), 1.2))
@@ -183,7 +186,7 @@ return function (props: {
 
                 if props.WaitForEach then task.wait(props.WaitForEach) end
                 
-                return MetaData
+                return index, MetaData
             end)
         }
     }

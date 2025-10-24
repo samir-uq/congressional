@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Confetti = require(script.Parent.Confetti)
 local Fusion = require(ReplicatedStorage.Packages.Fusion)
 local SimulationActions = require(ReplicatedStorage.Shared.Client.Handlers.SimulationActions)
 local Button = require(ReplicatedStorage.Shared.Client.Interface.Components.Default.Button)
@@ -20,6 +21,7 @@ local Dependency = {
     Text = Text,
     Button = Button,
     ProgressBar = ProgressBar,
+    Confetti = Confetti
 }
 
 type scope = Fusion.Scope<typeof(Fusion) & typeof(Dependency)>
@@ -45,6 +47,9 @@ return function (scope: any, props: {
         roundness = 0.1,
         onClick = function()
             SimulationActions.Vote(true, peek(props.id), true)
+            scope:Confetti {
+                ConfettiCount = 100
+            }
         end
     }
 
@@ -57,6 +62,9 @@ return function (scope: any, props: {
         roundness = 0.1,
         onClick = function()
            SimulationActions.Vote(true, peek(props.id), false)
+           scope:Confetti {
+                ConfettiCount = 100
+            }
         end
     }
 
@@ -83,6 +91,7 @@ return function (scope: any, props: {
         transparency = 0,
         color = Color3.new(1,1,1),
     }) {
+        LayoutOrder = props.publishDate,
         [Children] = Child {
             scope:New "UICorner" {
                 CornerRadius = UDim.new(0.1),

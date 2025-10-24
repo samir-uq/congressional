@@ -82,6 +82,8 @@ function Interface.Create(scope: scope, props: {
                             verticalAlignment = Enum.VerticalAlignment.Top,
                             animationSide = "left",
                             loadOrigin = "left",
+                            sortOrder = Enum.SortOrder.LayoutOrder,
+                            horizontalFlex = Enum.UIFlexAlignment.Fill,
                             inversedSetup = false,
                             visible = props.visible,
     
