@@ -29,6 +29,7 @@ return function (scope: any, props: {
     textYAlignment: state<Enum.TextYAlignment>?,
     textScaled: state<boolean>?,
     textSize: state<number>?,
+    maxTextSize: state<number>?,
 })
     local scope: scope = scope:innerScope(Dependency)
     local scaleSpring = scope:Spring(scope:Value(1), StateData.GetSpring("searchbarSize"), StateData.GetDamp("searchbarSize"))
@@ -77,6 +78,16 @@ return function (scope: any, props: {
                 TextTransparency = textTransparencySpring,
 
                 [Out "Text"] = props.text,
+                [Children] = Child {
+                    scope:Computed(function(use): Instance?
+                        local maxSize = use(props.maxTextSize)
+
+                        if not maxSize then return nil end
+                        return scope:New "UITextSizeConstraint" {
+                            MaxTextSize = maxSize,
+                        }
+                    end)
+                }
             }
         }
     }

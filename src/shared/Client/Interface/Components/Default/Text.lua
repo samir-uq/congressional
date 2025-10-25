@@ -26,6 +26,9 @@ return function (scope: scope, props: {
     alignmentX: state<Enum.TextXAlignment>?,
     alignmentY: state<Enum.TextYAlignment>?,
 
+    maxSize: state<number>?,
+    minSize: state<number>?,
+
     borderColor: state<Color3>?,
     borderPixel: state<number>?,
 
@@ -61,6 +64,19 @@ return function (scope: scope, props: {
 
                         BorderSizePixel =  props.borderPixel,
                         BorderColor3 = props.borderColor,
+
+                        [Children] = Child {
+                            scope:Computed(function(use): Instance?
+                                local maxSize = use(props.maxSize)
+                                local minSize = use(props.minSize)
+
+                                if not maxSize and not minSize then return nil end
+                                return scope:New "UITextSizeConstraint" {
+                                    MaxTextSize = maxSize,
+                                    MinTextSize = minSize
+                                }
+                            end)
+                        }
                     }
                    end
                return nil
@@ -90,6 +106,18 @@ return function (scope: scope, props: {
 
                 BorderSizePixel =  props.borderPixel,
                 BorderColor3 = props.borderColor,
+                [Children] = Child {
+                    scope:Computed(function(use): Instance?
+                        local maxSize = use(props.maxSize)
+                        local minSize = use(props.minSize)
+
+                        if not maxSize and not minSize then return nil end
+                        return scope:New "UITextSizeConstraint" {
+                            MaxTextSize = maxSize,
+                            MinTextSize = minSize
+                        }
+                    end)
+                }
             },
         }
     }

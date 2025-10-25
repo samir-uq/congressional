@@ -116,8 +116,8 @@ function Interface.Create(scope: scope, props: {
                                 text = content,
                                 size = UDim2.fromScale(1, 0.65),
                                 textYAlignment = Enum.TextYAlignment.Top,
-                                textScaled = false,
-                                textSize = 25,
+                                -- textScaled = false,
+                                maxTextSize = 25,
                                 placeholderText = "Topic Content"
                             },
 

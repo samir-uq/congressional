@@ -167,7 +167,7 @@ return function (scope: any, props: {
                         size = UDim2.fromScale(0.9, 0.6125),
                         alignmentX = Enum.TextXAlignment.Left,
                         alignmentY = Enum.TextYAlignment.Top,
-                        textSize = 20,
+                        maxSize = 20,
                         color = Color3.new()
                     },
 
