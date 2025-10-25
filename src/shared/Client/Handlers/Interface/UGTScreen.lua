@@ -11,6 +11,7 @@ local Container = require(ReplicatedStorage.Shared.Client.Interface.Components.D
 local Layout = require(ReplicatedStorage.Shared.Client.Interface.Components.Default.Layout)
 local Text = require(ReplicatedStorage.Shared.Client.Interface.Components.Default.Text)
 local ColorPallete = require(ReplicatedStorage.Shared.Client.Interface.MetaData.ColorPallete)
+local TrackerUtil = require(ReplicatedStorage.Shared.Client.Interface.Utils.TrackerUtil)
 local StateData = require(ReplicatedStorage.Shared.Configs.Data.StateData)
 local Interface = {}
 
@@ -91,7 +92,7 @@ function Interface.Create(scope: scope, props: {
                             content = scope:Computed(function(use, scope: scope)    
                                 local kids = scope:ForPairs(forkedInfo, function(use, scope: scope, key, value)
     
-                                    return value.PublishDate, scope:UserGeneratedDisplay {
+                                    return TrackerUtil.get(), scope:UserGeneratedDisplay {
                                         visible = props.visible,
                                         id = key,
                                         authenticated = value.Authenticated,
