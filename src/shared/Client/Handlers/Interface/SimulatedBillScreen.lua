@@ -39,10 +39,11 @@ function Interface.Create(scope: scope, props: {
     visible: state<boolean>,
     currentFrame: Fusion.Value<string>,
 })
-
+    scope = scope:innerScope(Dependency)
     forkedInfo = scope:Value({})
 
-    scope = scope:innerScope(Dependency)
+
+
     return scope:Hydrate(scope:Container {
         size = UDim2.fromScale(1,1),
     }) {
@@ -74,41 +75,30 @@ function Interface.Create(scope: scope, props: {
                 ScrollingDirection = Enum.ScrollingDirection.Y,
 
                 [Children] = Child({
-                    scope:Computed(function(use)
-                        use(forkedInfo)
-                        local childrens: any = scope:Layout {
-                            padding = UDim.new(0.02, 0),
-                            fillDir = Enum.FillDirection.Vertical,
-                            horizontalAlignment = Enum.HorizontalAlignment.Center,
-                            verticalAlignment = Enum.VerticalAlignment.Top,
-                            animationSide = "left",
-                            loadOrigin = "left",
-                            sortOrder = Enum.SortOrder.LayoutOrder,
-                            horizontalFlex = Enum.UIFlexAlignment.Fill,
-                            inversedSetup = false,
-                            visible = props.visible,
-    
-                            content = scope:Computed(function(use, scope: scope)    
-                                local kids = scope:ForPairs(forkedInfo, function(use, scope: scope, key, value)
-    
-                                    return TrackerUtil.get(), scope:BillDisplay {
-                                        visible = props.visible,
-                                        id = key,
-                                        authenticated = value.Authenticated,
-                                        publishDate = value.PublishDate,
-                                        publisher = value.Publisher,
-                                        title = value.Bill.Name,
-                                        content = value.Bill.Content,
-                                        prewritterns = value.Bill.Prewrittens,
-                                        lean = 0,
-                                    }
-                                end)
-                                return peek(kids)
-                            end)
-                        }
+                    scope:ForPairs(forkedInfo, function(use, scope: scope, key, value)
 
-                        return childrens:GetChildren()
-                    end)
+                        return TrackerUtil.get(), scope:BillDisplay {
+                            visible = props.visible,
+                            id = key,
+                            authenticated = value.Authenticated,
+                            publishDate = value.PublishDate,
+                            publisher = value.Publisher,
+                            title = value.Bill.Name,
+                            content = value.Bill.Content,
+                            prewritterns = value.Bill.Prewrittens,
+                            lean = 0,
+                        }
+                    end),
+
+                    scope:New "UIListLayout" {
+
+                        Padding = UDim.new(0.02),
+                        FillDirection = Enum.FillDirection.Vertical,
+                        HorizontalAlignment = Enum.HorizontalAlignment.Center,
+                        VerticalAlignment = Enum.VerticalAlignment.Top,
+                        SortOrder = Enum.SortOrder.LayoutOrder,
+                        HorizontalFlex = Enum.UIFlexAlignment.Fill
+                    }
                 })
             }),
 

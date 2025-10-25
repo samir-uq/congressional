@@ -75,39 +75,29 @@ function Interface.Create(scope: scope, props: {
                 ScrollingDirection = Enum.ScrollingDirection.Y,
 
                 [Children] = Child({
-                    scope:Computed(function(use)
-                        use(forkedInfo)
-                        local childrens: any = scope:Layout {
-                            padding = UDim.new(0.02, 0),
-                            fillDir = Enum.FillDirection.Vertical,
-                            horizontalAlignment = Enum.HorizontalAlignment.Center,
-                            verticalAlignment = Enum.VerticalAlignment.Top,
-                            animationSide = "left",
-                            loadOrigin = "left",
-                            sortOrder = Enum.SortOrder.LayoutOrder,
-                            horizontalFlex = Enum.UIFlexAlignment.Fill,
-                            inversedSetup = false,
-                            visible = props.visible,
-    
-                            content = scope:Computed(function(use, scope: scope)    
-                                local kids = scope:ForPairs(forkedInfo, function(use, scope: scope, key, value)
-    
-                                    return TrackerUtil.get(), scope:UserGeneratedDisplay {
-                                        visible = props.visible,
-                                        id = key,
-                                        authenticated = value.Authenticated,
-                                        publishDate = value.PublishDate,
-                                        publisher = value.Publisher,
-                                        title = value.Title,
-                                        content = value.Data,
-                                        lean = value.Lean,
-                                    }
-                                end)
-                                return peek(kids)
-                            end)
-                        }
 
-                        return childrens:GetChildren()
+                    scope:New "UIListLayout" {
+
+                        Padding = UDim.new(0.02),
+                        FillDirection = Enum.FillDirection.Vertical,
+                        HorizontalAlignment = Enum.HorizontalAlignment.Center,
+                        VerticalAlignment = Enum.VerticalAlignment.Top,
+                        SortOrder = Enum.SortOrder.LayoutOrder,
+                        HorizontalFlex = Enum.UIFlexAlignment.Fill
+                    },
+
+                    scope:ForPairs(forkedInfo, function(use, scope: scope, key, value)
+    
+                        return TrackerUtil.get(), scope:UserGeneratedDisplay {
+                            visible = props.visible,
+                            id = key,
+                            authenticated = value.Authenticated,
+                            publishDate = value.PublishDate,
+                            publisher = value.Publisher,
+                            title = value.Title,
+                            content = value.Data,
+                            lean = value.Lean,
+                        }
                     end)
                 })
             }),

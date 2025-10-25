@@ -28,7 +28,7 @@ return function (scope: scope, props: {
     scope = scope:innerScope(Dependency) :: scope
 
     props.visible = DelayValue(props.visible, scope, props.animDelay)
-    local visibleDelay = DelayValue(props.visible, scope, 0.5)
+    -- local visibleDelay = DelayValue(props.visible, scope, 0.5)
 
     local scale = scope:Computed(function(use, scope: scope)
         if use(props.visible) then
@@ -36,7 +36,7 @@ return function (scope: scope, props: {
         end
         return UDim2.new()
     end)
-    local scaleSpring = scope:Spring(scale, StateData.GetSpring(props.animNameScale or "buttonScale"), StateData.GetDamp(props.animNameScale or "buttonDamp"))
+    -- local scaleSpring = scope:Spring(scale, StateData.GetSpring(props.animNameScale or "buttonScale"), StateData.GetDamp(props.animNameScale or "buttonDamp"))
 
     local anchor = scope:Computed(function(use, scope: scope)
         local configData = use(props.animationSide or "bottom")
@@ -47,7 +47,7 @@ return function (scope: scope, props: {
         end
         return animationData.idleAnchorPoint
     end)
-    local anchorSpring = scope:Spring(anchor, StateData.GetSpring(props.animNameAnchor or "buttonAnchor"), StateData.GetDamp(props.animNameAnchor or "buttonAnchor"))
+    -- local anchorSpring = scope:Spring(anchor, StateData.GetSpring(props.animNameAnchor or "buttonAnchor"), StateData.GetDamp(props.animNameAnchor or "buttonAnchor"))
 
     local pos = scope:Computed(function(use, scope: scope)
         local configData = use(props.animationSide or "bottom")
@@ -58,18 +58,19 @@ return function (scope: scope, props: {
         end
         return animationData.inactivePosition
     end)
-    local posSpring = scope:Spring(pos, StateData.GetSpring(props.animNamePos or "buttonPosition"), StateData.GetDamp(props.animNamePos or "buttonPosition"))
+    -- local posSpring = scope:Spring(pos, StateData.GetSpring(props.animNamePos or "buttonPosition"), StateData.GetDamp(props.animNamePos or "buttonPosition"))
 
     return scope:Hydrate(props.obj :: any) {
-        AnchorPoint = anchorSpring,
-        Size = scaleSpring,
-        Position = posSpring,
-        Visible = scope:Computed(function(use)
-            if use(props.visible) then
-                return true
-            end
+        AnchorPoint = anchor,
+        Size = scale,
+        Position = pos,
+        Visible = props.visible,
+        -- Visible = scope:Computed(function(use)
+        --     if use(props.visible) then
+        --         return true
+        --     end
 
-            return use(visibleDelay)
-        end)
+        --     return use(visibleDelay)
+        -- end)
     }
 end
