@@ -1,10 +1,14 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Fusion = require(ReplicatedStorage.Packages.Fusion)
+local SimulationActions = require(ReplicatedStorage.Shared.Client.Handlers.SimulationActions)
 local StateDataManager = require(ReplicatedStorage.Shared.Client.Handlers.StateDataManager)
 local Background = require(ReplicatedStorage.Shared.Client.Interface.Components.Congress.Background)
 local BillDisplay = require(ReplicatedStorage.Shared.Client.Interface.Components.Congress.BillDisplay)
 local ChamberDataContainer = require(ReplicatedStorage.Shared.Client.Interface.Components.Congress.ChamberDataContainer)
+local Confetti = require(ReplicatedStorage.Shared.Client.Interface.Components.Congress.Confetti)
+local Searchbar = require(ReplicatedStorage.Shared.Client.Interface.Components.Congress.Searchbar)
+local SelectOptions = require(ReplicatedStorage.Shared.Client.Interface.Components.Congress.SelectOptions)
 local UserGeneratedDisplay = require(ReplicatedStorage.Shared.Client.Interface.Components.Congress.UserGeneratedDisplay)
 local Button = require(ReplicatedStorage.Shared.Client.Interface.Components.Default.Button)
 local Container = require(ReplicatedStorage.Shared.Client.Interface.Components.Default.Container)
@@ -27,22 +31,37 @@ local Dependency = {
     Button = Button,
     Layout = Layout,
     Text = Text,
-    UserGeneratedDisplay = UserGeneratedDisplay
+    Searchbar = Searchbar,
+    SelectOptions = SelectOptions,
+    Confetti = Confetti
 }
 
 type scope = Fusion.Scope<typeof(Fusion) & typeof(Dependency)>
 type state<T> = Fusion.UsedAs<T>
 
-local forkedInfo: Fusion.Value<any>
 
 function Interface.Create(scope: scope, props: {
     visible: state<boolean>,
     currentFrame: Fusion.Value<string>,
 })
 
-    forkedInfo = scope:Value({})
-
     scope = scope:innerScope(Dependency)
+
+    local name = scope:Value("")
+    local content = scope:Value("")
+    local leanText = scope:Value("0")
+    local lean = scope:Computed(function(use)
+        local tonum = math.clamp(tonumber(use(leanText)) or 0, -1, 1)
+        return tonum
+    end)
+
+    local selectionOpened = scope:Value(false)
+    scope:Observer(props.visible):onBind(function()
+        local isFalse = peek(props.visible) == false
+        if not isFalse then return end
+        selectionOpened:set(false)
+    end)
+
     return scope:Hydrate(scope:Container {
         size = UDim2.fromScale(1,1),
     }) {
@@ -51,7 +70,7 @@ function Interface.Create(scope: scope, props: {
             scope:Text {
                 disableShadow = true,
                 color = Color3.new(1,1,1),
-                text = "Simulated User Generated Topics",
+                text = "User Generated Topics",
                 size = UDim2.fromScale(1, 0.1),
                 position = UDim2.fromScale(0.5, 0),
                 anchorPoint = Vector2.new(0.5, 0)
@@ -74,42 +93,73 @@ function Interface.Create(scope: scope, props: {
                 ScrollingDirection = Enum.ScrollingDirection.Y,
 
                 [Children] = Child({
-                    scope:Computed(function(use)
-                        use(forkedInfo)
-                        local childrens: any = scope:Layout {
-                            padding = UDim.new(0.02, 0),
-                            fillDir = Enum.FillDirection.Vertical,
-                            horizontalAlignment = Enum.HorizontalAlignment.Center,
-                            verticalAlignment = Enum.VerticalAlignment.Top,
-                            animationSide = "left",
-                            loadOrigin = "left",
-                            sortOrder = Enum.SortOrder.LayoutOrder,
-                            horizontalFlex = Enum.UIFlexAlignment.Fill,
-                            inversedSetup = false,
-                            visible = props.visible,
-    
-                            content = scope:Computed(function(use, scope: scope)    
-                                local kids = scope:ForPairs(forkedInfo, function(use, scope: scope, key, value)
-    
-                                    return value.PublishDate, scope:UserGeneratedDisplay {
-                                        visible = props.visible,
-                                        id = key,
-                                        authenticated = value.Authenticated,
-                                        publishDate = value.PublishDate,
-                                        publisher = value.Publisher,
-                                        title = value.Title,
-                                        content = value.Data,
-                                        lean = value.Lean,
-                                    }
-                                end)
-                                return peek(kids)
-                            end)
-                        }
+                    scope:Layout {
+                        padding = UDim.new(0.02, 0),
+                        fillDir = Enum.FillDirection.Vertical,
+                        horizontalAlignment = Enum.HorizontalAlignment.Center,
+                        verticalAlignment = Enum.VerticalAlignment.Top,
+                        animationSide = "left",
+                        loadOrigin = "left",
+                        sortOrder = Enum.SortOrder.LayoutOrder,
+                        horizontalFlex = Enum.UIFlexAlignment.Fill,
+                        inversedSetup = false,
+                        visible = props.visible,
 
-                        return childrens:GetChildren()
-                    end)
+                        content = {
+                            scope:Searchbar {
+                                text = name,
+                                size = UDim2.fromScale(1, 0.1),
+                                placeholderText = "Title",
+                            },
+
+                            scope:Searchbar {
+                                text = content,
+                                size = UDim2.fromScale(1, 0.65),
+                                textYAlignment = Enum.TextYAlignment.Top,
+                                textScaled = false,
+                                textSize = 25,
+                                placeholderText = "Topic Content"
+                            },
+
+                            scope:Searchbar {
+                                text = leanText,
+                                size = UDim2.fromScale(1, 0.1),
+                                placeholderText = "Lean [-1,1]",
+                            },
+                        }
+                    }
                 })
             }),
+
+            scope:Computed(function(use)
+                local button = scope:Button {
+                    color = ColorPallete.greenOne,
+                    visible = props.visible,
+                    size = UDim2.fromScale(0.5, 0.08),
+                    position = UDim2.fromScale(0.5, 0.83),
+                    roundness = 0.1,
+                    onClick = function()
+                        local Success = SimulationActions.CreateUGT(peek(name), peek(content), peek(lean))
+                        if not Success then return end
+                       scope:Confetti {
+                        ConfettiCount = 100
+                        }
+
+                        props.currentFrame:set("View User Generated")
+                    end
+                }
+
+                scope:Hydrate(button:FindFirstChildWhichIsA("ImageButton") :: ImageButton) {
+                    [Children] = Child {
+                        scope:Text {
+                            disableShadow = true,
+                            text = "Propose",
+                        }
+                    }
+                }
+
+                return button
+            end),
 
             scope:Computed(function(use)
                 local button = scope:Button {
@@ -139,10 +189,7 @@ function Interface.Create(scope: scope, props: {
 end
 
 function Interface.Start()
-    StateDataManager.GetSignals().UGT:Connect(function()
-        if not forkedInfo then return end
-        forkedInfo:set(StateDataManager.Get().UGT)
-    end)
+   
 end
 
 return Interface

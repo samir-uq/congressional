@@ -46,7 +46,8 @@ return function (scope: any, props: {
         anchorPoint = Vector2.new(0, 0.5),
         roundness = 0.1,
         onClick = function()
-            SimulationActions.Vote(true, peek(props.id), true)
+            local Success = SimulationActions.Vote(true, peek(props.id), true)
+            if not Success then return end
             scope:Confetti {
                 ConfettiCount = 100
             }
@@ -61,7 +62,8 @@ return function (scope: any, props: {
         anchorPoint = Vector2.new(1, 0.5),
         roundness = 0.1,
         onClick = function()
-           SimulationActions.Vote(true, peek(props.id), false)
+            local Success = SimulationActions.Vote(true, peek(props.id), false)
+            if not Success then return end
            scope:Confetti {
                 ConfettiCount = 100
             }
@@ -91,7 +93,9 @@ return function (scope: any, props: {
         transparency = 0,
         color = Color3.new(1,1,1),
     }) {
-        LayoutOrder = props.publishDate,
+        LayoutOrder = scope:Computed(function(use)
+            return -use(props.publishDate)
+        end),
         [Children] = Child {
             scope:New "UICorner" {
                 CornerRadius = UDim.new(0.1),

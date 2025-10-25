@@ -10,7 +10,7 @@ local ServerEvent = require(ReplicatedStorage.Shared.Event.ServerEvent)
 local Robase = require(ServerScriptService.Server.Utilities.Robase)
 
 local UGT = {}
-local Cooldowns = {}
+-- local Cooldowns = {}
 
 
 local TopicsBase = (Robase::any):GetRobase("UserGeneratedTopics")
@@ -31,9 +31,9 @@ end
 
 function UGT.Create(Player: Player, TopicTitle: string, TopicBody: string, TopicLean: number): (boolean, string)
 	
-	if Cooldowns[Player] then
-		return false, "Attempt again in " .. math.round(COOLDOWN_PER_UGT - (DateTime.now().UnixTimestamp - Cooldowns[Player]))
-	end
+	-- if Cooldowns[Player] then
+	-- 	return false, "Attempt again in " .. math.round(COOLDOWN_PER_UGT - (DateTime.now().UnixTimestamp - Cooldowns[Player]))
+	-- end
 	
 	if typeof(TopicTitle) ~= "string" then
 		return false, "Invalid data"
@@ -56,10 +56,10 @@ function UGT.Create(Player: Player, TopicTitle: string, TopicBody: string, Topic
 	local PublicationTime = DateTime.now().UnixTimestamp
 	local Id = HttpService:GenerateGUID()
 	
-	Cooldowns[Player] = PublicationTime
-	task.delay(COOLDOWN_PER_UGT, function()
-		Cooldowns[Player] = nil
-	end)
+	-- Cooldowns[Player] = PublicationTime
+	-- task.delay(COOLDOWN_PER_UGT, function()
+	-- 	Cooldowns[Player] = nil
+	-- end)
 	
 	local UGData = {
 		Title = TopicTitle,

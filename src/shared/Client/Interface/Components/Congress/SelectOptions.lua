@@ -28,9 +28,8 @@ type scope = Fusion.Scope<typeof(Fusion) & typeof(Dependency)>
 type state<T> = Fusion.UsedAs<T>
 return function (scope: any, props: {
     opened: Fusion.Value<boolean>,
-    filters: state<{{name: state<string>, valid: ((any)->boolean)}}>,
     items: state<any>,-- TODO,
-    selected: Fusion.Value<string>
+    onSelect: ((any)->()),
 })
     local scope: scope = scope:innerScope(Dependency)
 
@@ -59,8 +58,9 @@ return function (scope: any, props: {
 
     local button = scope:Button {
         visible = true,
-        size = UDim2.fromScale(0.415, 1),
-        image = "rbxassetid://109184285128135",
+        size = UDim2.fromScale(0.7, 0.4),
+        -- image = "rbxassetid://109184285128135",
+        roundness = 0.125,
         animationSide = "top",
         color = Color3.new(1,1,1),
         onClick = function()
@@ -71,16 +71,13 @@ return function (scope: any, props: {
     }
 
     scope:Hydrate(button:FindFirstChildWhichIsA("ImageButton") :: ImageButton) {
+        Size = UDim2.fromScale(0.95, 0.8),
         [Children] = Child {
-            scope:New "UIGradient" {
-                Color = ColorPallete.topSequence,
-                Rotation = 5
-            },
 
             scope:Hydrate(scope:Image {
                 size = UDim2.fromScale(0.45, 0.45),
                 sizeConstraint = Enum.SizeConstraint.RelativeYY,
-                position = UDim2.fromScale(0.85, 0.43),
+                position = UDim2.fromScale(0.95, 0.43),
                 image = "rbxassetid://106487695588019",
             }) {
                 Rotation = rotSpring,
@@ -95,29 +92,20 @@ return function (scope: any, props: {
 
             scope:Text {
                 disableShadow = true,
-                color = Color3.new(1,1,1),
-                text = "Quality",
+                color = ColorPallete.greyOne,
+                text = "Select",
                 anchorPoint = Vector2.new(0, 0.5),
-                size = UDim2.fromScale(0.645, 0.5),
-                position = UDim2.fromScale(0.107, 0.43),
+                size = UDim2.fromScale(0.645, 0.9),
+                position = UDim2.fromScale(0.05, 0.5),
                 alignmentX = Enum.TextXAlignment.Left
             },
 
-            scope:Image {
-                size = UDim2.fromScale(0.85, 0.9),
-                sizeConstraint = Enum.SizeConstraint.RelativeYY,
-                position = UDim2.fromScale(0.7, 0.415),
-                image = "rbxassetid://116965044778180",
-                transparency = 0.5,
-                color = ColorPallete.greySeven
-            },
 
             scope:ProgressBar {
                 percentage = dropdownOpenPercentageSpring,
                 direction = "down",
-                -- compressSize = 0.8,
-                disableCompress = true,
-                size = UDim2.fromScale(0.86, 2.107),
+                compressSize = 0.8,
+                size = UDim2.fromScale(1, 4),
                 position = UDim2.fromScale(0.5, 0),
                 anchorPoint = Vector2.new(0.5, 1),
 
@@ -125,17 +113,13 @@ return function (scope: any, props: {
                     size = UDim2.fromScale(1,1)
                 }) {
                     [Children] = Child {
-                        scope:Hydrate(scope:Image {
+                        scope:Hydrate(scope:Container {
                             image = "rbxassetid://91475227618595",
+                            transparency = 0,
                             size = UDim2.fromScale(1,1),
-                            imageType = Enum.ScaleType.Slice
+                            color = ColorPallete.greySix
                         }) {
-                            SliceCenter = Rect.new(451, 101, 451, 399),
                             [Children] = Child {
-                                scope:New "UIGradient" {
-                                    Rotation = 15,
-                                    Color = ColorPallete.topSequence
-                                },
 
                                 scope:Hydrate(scope:Image {
                                     anchorPoint = Vector2.new(0.5, 1),
@@ -162,13 +146,13 @@ return function (scope: any, props: {
                         scope:New "ScrollingFrame" {
                             AnchorPoint = Vector2.new(0.5, 0.5),
                             Position = UDim2.fromScale(0.5, 0.45),
-                            Size = UDim2.fromScale(0.91, 0.8),
+                            Size = UDim2.fromScale(0.95, 1),
                             BackgroundTransparency = 1,
 
                             AutomaticCanvasSize =  Enum.AutomaticSize.Y,
                             CanvasSize = UDim2.new(),
                             ScrollBarImageColor3 = ColorPallete.vanillaOne,
-                            ScrollBarThickness = 4,
+                            ScrollBarThickness = 0,
                             VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar,
                             TopImage = "rbxassetid://71418806063429",
                             MidImage = "rbxassetid://140249735342084",
@@ -177,6 +161,7 @@ return function (scope: any, props: {
 
                             [Children] = Child {
                                 scope:Computed(function(use, scope: scope)
+                                    use(props.items)
                                     local final = scope:Layout {
                                         padding = UDim.new(0.02, 0),
                                         fillDir = Enum.FillDirection.Vertical,
@@ -189,24 +174,7 @@ return function (scope: any, props: {
                                         visible = true,
 
                                         content = scope:Computed(function(use, scope: scope)
-                                            local kids = scope:ForPairs(props.filters, function(use, scope: scope, index: number, data: {name: state<string>, valid: ((any)->boolean)})
-                                                local val = scope:Computed(function(use, scope: scope)
-                                                    local count = 0
-                                                    for _, item in use(props.items) do
-                                                        if data.valid(item) then
-                                                            count+= 1
-                                                        end
-                                                    end
-                                                    return count
-                                                end)
-                                                local valSpr = scope:Spring(val, StateData.GetSpring("qualityfilterValue"), StateData.GetDamp("qualityfilterValue"))
-
-                                                local transparencyVal = scope:Computed(function(use, scope: scope)
-                                                    return if use(props.selected) == use(data.name) then 0 else 1
-                                                end)
-                                                local transparencySpr = scope:Spring(transparencyVal, StateData.GetSpring("qualityfilterTransparency"), StateData.GetDamp("qualityfilterTransparency"))
-                                                table.insert(valSprings, valSpr)
-
+                                            local kids = scope:ForPairs(props.items, function(use, scope: scope, index: number, data: {name: string, id: string})
                                                 local button = scope:Button {
                                                     size = UDim2.fromScale(0.9, 0.4),
                                                     visible = true,
@@ -215,7 +183,7 @@ return function (scope: any, props: {
                                                     animationSide = "left",
                                                     hoverScale = 1.02,
                                                     onClick = function()
-                                                        props.selected:set(use(data.name) :: string)
+                                                        props.onSelect(data.id)
                                                         props.opened:set(false)
                                                     end
                                                 }
@@ -238,44 +206,17 @@ return function (scope: any, props: {
                                                                     disableShadow = true,
                                                                     text = use(data.name),
                                                                     size = UDim2.fromScale(0.5, 0.65),
-                                                                    color = ColorPallete.greySix,
+                                                                    color = Color3.new(),
                                                                     alignmentX = Enum.TextXAlignment.Left,
                                                                 },
-                                                                scope:Text {
-                                                                    disableShadow = true,
-                                                                    text = scope:Computed(function(use, scope: scope)
-                                                                        return tostring(math.round(use(valSpr)))
-                                                                    end),
-                                                                        size = UDim2.fromScale(0.5, 0.65),
-                                                                        position = UDim2.fromScale(0.953, 0.5),
-                                                                        anchorPoint = Vector2.new(1, 0.5),
-                                                                        color = Color3.new(1,1,1),
-                                                                        alignmentX = Enum.TextXAlignment.Right,
-                                                                    },
                                                                 }
                                                             },
-
-                                                            scope:Hydrate(scope:Container {
-                                                                size = UDim2.fromScale(1.05, 1),
-                                                                transparency = transparencySpr
-                                                            }) {
-                                                                [Children] = Child {
-                                                                    scope:New "UICorner" {
-                                                                        CornerRadius = UDim.new(0.5, 0),
-                                                                    },
-                                                                    scope:New "UIGradient" {
-                                                                        Color = ColorPallete.goldTwoSequence,
-                                                                        Transparency = NumberSequence.new(0.5),
-                                                                    }
-                                                                }
-                                                            }
                                                     }
                                                 }
-
                                                 return index, button
                                             end)
 
-                                            return peek(kids)
+                                           return peek(kids)
                                         end)
                                     }
 

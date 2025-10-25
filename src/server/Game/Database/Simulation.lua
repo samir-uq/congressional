@@ -11,12 +11,12 @@ local Robase = require(ServerScriptService.Server.Utilities.Robase)
 
 
 local Sim = {}
-local Cooldowns = {}
+-- local Cooldowns = {}
 
 local AllSim = {}
 
 local SimulationBase = (Robase :: any):GetRobase("Simulation")
-local COOLDOWN_PER_SIMULATION = 250
+local COOLDOWN_PER_SIMULATION = 1
 local MIN_VOTES = 1
 
 
@@ -175,18 +175,18 @@ function Sim.CreateGlobal(Player: Player, SimulatedBill: GameTypes.SimBillCore):
 		return false, "Failed to validate bill. Reason ".. ReasonNum
 	end
 
-	if Cooldowns[Player] then
-		return false, "Attempt again in " .. math.round(COOLDOWN_PER_SIMULATION - (DateTime.now().UnixTimestamp - Cooldowns[Player]))
-	end
+	-- if Cooldowns[Player] then
+	-- 	return false, "Attempt again in " .. math.round(COOLDOWN_PER_SIMULATION - (DateTime.now().UnixTimestamp - Cooldowns[Player]))
+	-- end
 
 	local PublicationTime = DateTime.now().UnixTimestamp
 	local Id = HttpService:GenerateGUID()
 
 
-	Cooldowns[Player] = PublicationTime
-	task.delay(COOLDOWN_PER_SIMULATION, function()
-		Cooldowns[Player] = nil
-	end)
+	-- Cooldowns[Player] = PublicationTime
+	-- task.delay(COOLDOWN_PER_SIMULATION, function()
+	-- 	Cooldowns[Player] = nil
+	-- end)
 
 	local BillData = {
 		Publisher = Player.UserId,
@@ -288,6 +288,7 @@ function Sim.Start()
     ServerEvent.RunSim.On(function(Player: Player, Data): any
         if Data.Global then
             local Success, Result = Sim.CreateGlobal(Player, Data.SimulatingBill :: any)
+			print(Success, Result)
             return {Success = Success, Result = Result}
         end
 
@@ -305,12 +306,13 @@ function Sim.Start()
         else
             Success, Result = Sim.VoteGlobal(Player, Data.Id, Data.Vote)
         end
-
+		print(Success, Result)
         return {Success = Success, Result = Result}
     end)
 
     ServerEvent.CreateUGT.On(function(Player: Player, Data)
         local Success, Result = UGT.Create(Player, Data.Title, Data.Body, Data.Lean)
+		print(Success, Result)
         return {Success = Success, Result = Result}
     end)
 

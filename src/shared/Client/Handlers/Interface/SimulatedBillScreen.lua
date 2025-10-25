@@ -65,7 +65,7 @@ function Interface.Create(scope: scope, props: {
                 AutomaticCanvasSize = Enum.AutomaticSize.Y,
                 CanvasSize = UDim2.new(),
                 ScrollBarImageColor3 = ColorPallete.greyFive,
-                ScrollBarThickness = 4,
+                ScrollBarThickness = 0,
                 VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar,
                 TopImage = "rbxassetid://71418806063429",
                 MidImage = "rbxassetid://140249735342084",

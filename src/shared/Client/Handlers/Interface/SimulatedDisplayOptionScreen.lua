@@ -66,7 +66,7 @@ function Interface.Create(scope: scope, props: {
                         visible = props.visible,
                         content = scope:Computed(function(use)
                             local buttons = {}
-                            for _, item in {"Create Sim Bill", "Create Global  Bill", "Create UGT"} do --"View Amendments", "View Bills", 
+                            for _, item in { "Create Global Bill", "Create UGT"} do --"View Amendments", "View Bills", ""Create Sim Bill"
                                 local buttonComponent = scope:Button {
                                     roundness = 0.2,
                                     color = ColorPallete.whiteTwo,
