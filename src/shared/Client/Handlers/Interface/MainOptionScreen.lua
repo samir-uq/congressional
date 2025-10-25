@@ -48,6 +48,7 @@ function Interface.Create(scope: scope, props: {
                     [Children] = Child {
                         scope:Hydrate(scope:Image {
                             image = "rbxassetid://113951477807447",
+                            imageType = Enum.ScaleType.Fit,
                             size = UDim2.fromScale(0.5, 0.5),
                             position = UDim2.fromScale(0.5, 0.4),
                         }) {

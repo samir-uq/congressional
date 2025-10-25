@@ -146,7 +146,7 @@ function Interface.Create(scope: scope, props: {
                     scope:ChamberDataContainer {
                         visible = props.visible,
                         electInformation = electorData,
-                        diameter = 37,
+                        diameter = 45,
                         center = 0.05
                     }
                 }
