@@ -9,91 +9,100 @@ local Children = Fusion.Children
 local Child = Fusion.Child
 local Out = Fusion.Out
 
+local REFERENCE = Vector2.new(2550, 1225)
 local seatDiameterPx = 100
 local gapFactor = 1.5
+
 local Dependency = {
-    Container = Container,
-    InfoDisplayCircle = InfoDisplayCircle
+	Container = Container,
+	InfoDisplayCircle = InfoDisplayCircle
 }
 
 type scope = Fusion.Scope<typeof(Fusion) & typeof(Dependency)>
 type state<T> = Fusion.UsedAs<T>
-return function (scope: any, props: {
-    electInformation: state<{
-       { name: state<string>?,
-        state: state<string>?,
-        district: state<string>?,
-        party: state<string>?,
-        termStartYear: state<string>?}
-    }>,
-    visible: state<boolean>,
-    diameter: number?,
-    center: number,
+
+return function(scope: any, props: {
+	electInformation: state<{
+		{ name: state<string>?,
+		state: state<string>?,
+		district: state<string>?,
+		party: state<string>?,
+		termStartYear: state<string>?}
+	}>,
+	visible: state<boolean>,
+	diameter: number?,
+	center: number,
 })
-    local scope: scope = scope:innerScope(Dependency)
-    local seatDiam = props.diameter or seatDiameterPx
+	local scope: scope = scope:innerScope(Dependency)
 
-    local absoluteSize = scope:Value(Vector2.new())
-    scope:Hydrate(workspace.CurrentCamera) {
-        [Out "ViewportSize"] = absoluteSize
-    }
+	local absoluteSize = scope:Value(Vector2.new())
+	scope:Hydrate(workspace.CurrentCamera) {
+		[Out "ViewportSize"] = absoluteSize
+	}
 
-    -- reactive center positions
-    local centerX = scope:Computed(function(use)
-        return use(absoluteSize).X / 2
-    end)
+	local scale = scope:Computed(function(use)
+		local real = use(absoluteSize)
+		if real.X == 0 or real.Y == 0 then return 1 end
+		local sx = real.X / REFERENCE.X
+		local sy = real.Y / REFERENCE.Y
+		return math.min(sx, sy)
+	end)
 
-    local centerY = scope:Computed(function(use)
-        return use(absoluteSize).Y * (1 - props.center)
-    end)
+	local centerX = scope:Computed(function(use)
+		return use(absoluteSize).X / 2
+	end)
 
-    -- derived constants
-    local rowStep = seatDiam * gapFactor
-    local innerRadius = seatDiam * 1.2
+	local centerY = scope:Computed(function(use)
+		return use(absoluteSize).Y * (1 - props.center)
+	end)
 
-    return scope:Hydrate(scope:Container {
-        size = UDim2.fromScale(1, 1)
-    }) {
-        [Children] = Child {
-            scope:ForPairs(props.electInformation, function(use, seatScope: any, index, info)
-                -- recompute geometry reactively
-                local W, H = use(absoluteSize).X, use(absoluteSize).Y
-                local cx, cy = use(centerX), use(centerY)
+	return scope:Hydrate(scope:Container {
+		size = UDim2.fromScale(1, 1)
+	}) {
+		[Children] = Child {
+			scope:ForPairs(props.electInformation, function(use, seatScope: any, index, info)
+				local real = use(absoluteSize)
+				local s = use(scale)
 
-                -- determine how many seats can fit in the current radius
-                local radius = innerRadius
-                local remaining = index
-                local seatsInRow = math.floor((math.pi * radius) / seatDiam)
-                while remaining > seatsInRow do
-                    remaining -= seatsInRow
-                    radius += rowStep
-                    seatsInRow = math.floor((math.pi * radius) / seatDiam)
-                end
+				local seatDiam = (props.diameter or seatDiameterPx) * s
+				local rowStep = seatDiam * gapFactor
+				local innerRadius = seatDiam * 1.2
 
-                -- seat position along arc (π → 0 for left→right)
-                local theta = math.pi - (math.pi * (remaining - 0.5) / seatsInRow)
-                local posX = cx + radius * math.cos(theta)
-                local posY = cy - radius * math.sin(theta)
+				local W, H = real.X, real.Y
+				local cx, cy = use(centerX), use(centerY)
 
-                return index, seatScope:InfoDisplayCircle {
-                    name = info.name,
-                    state = info.state,
-                    district = info.district,
-                    party = info.party,
-                    termStartYear = info.termStartYear,
-                    visible = props.visible,
+				local radius = innerRadius
+				local remaining = index
+				local seatsInRow = math.floor((math.pi * radius) / seatDiam)
+				while remaining > seatsInRow do
+					remaining -= seatsInRow
+					radius += rowStep
+					seatsInRow = math.floor((math.pi * radius) / seatDiam)
+				end
 
-                    size = seatScope:Computed(function(use)
-                        local a = use(absoluteSize)
-                        return UDim2.fromScale(seatDiam *.9 / a.X, seatDiam * .9 / a.Y)
-                    end),
+				local theta = math.pi - (math.pi * (remaining - 0.5) / seatsInRow)
+				local posX = cx + radius * math.cos(theta)
+				local posY = cy - radius * math.sin(theta)
 
-                    position = seatScope:Computed(function(use)
-                        local a = use(absoluteSize)
-                        return UDim2.fromScale(posX / a.X, posY / a.Y)
-                    end)
-                }
-            end)
-        }
-    }
+				return index, seatScope:InfoDisplayCircle {
+					name = info.name,
+					state = info.state,
+					district = info.district,
+					party = info.party,
+					termStartYear = info.termStartYear,
+					visible = props.visible,
+
+					size = seatScope:Computed(function(use)
+						local a = use(absoluteSize)
+						return UDim2.fromScale(seatDiam / a.X, seatDiam / a.Y)
+					end),
+
+					position = seatScope:Computed(function(use)
+						local a = use(absoluteSize)
+						return UDim2.fromScale(posX / a.X, posY / a.Y)
+					end)
+				}
+			end)
+		}
+	}
 end

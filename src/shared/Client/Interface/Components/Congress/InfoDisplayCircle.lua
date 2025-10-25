@@ -12,6 +12,7 @@ local scoped = Fusion.scoped
 local peek = Fusion.peek
 local Children = Fusion.Children
 local Child = Fusion.Child
+local Out = Fusion.Out
 
 local Dependency = {
     Container = Container,
@@ -49,6 +50,8 @@ return function (scope: scope, props: {
         return if use(isHovering) then 100 else 1
     end)
 
+    local absPos = scope:Value(Vector2.new())
+    local absSize = scope:Value(Vector2.new())
     local button = scope:Hydrate(scope:Button {
         roundness = 1,
         size = props.size or UDim2.fromScale(0.4, 0.4),
@@ -60,6 +63,8 @@ return function (scope: scope, props: {
     }) {
         SizeConstraint = Enum.SizeConstraint.RelativeXX,
         ZIndex = order,
+        [Out "AbsolutePosition"] = absPos,
+        [Out "AbsoluteSize"] = absSize,
 
         [Children] = Child {
             scope:New "UIAspectRatioConstraint" {
@@ -73,7 +78,27 @@ return function (scope: scope, props: {
         [Children] = Child {
             scope:Hydrate(scope:Container {
                 size = UDim2.fromOffset(UIConfiguration.statsSize*0.8,UIConfiguration.statsSize*0.95),
-                position = UDim2.fromScale(1.03,0.4),
+                position = scope:Computed(function(use)
+                    local pos:Vector2 = use(absPos)
+                    local size:Vector2 = use(absSize)
+                    local finalPos = pos + Vector2.new(UIConfiguration.statsSize*0.8, UIConfiguration.statsSize*0.95) + size/2 + Vector2.new(100,100)
+
+                    local x = 0
+                    local y = 0
+                    local xf = 1.03
+                    local yf = 0.4
+                    if finalPos.X > workspace.CurrentCamera.ViewportSize.X then 
+                        x = -UIConfiguration.statsSize*0.8
+                        xf=0
+                    end
+
+                    if finalPos.Y > workspace.CurrentCamera.ViewportSize.Y then
+                        y = -UIConfiguration.statsSize*0.95
+                        yf=0.125
+                    end
+
+                    return UDim2.new(xf,x,yf,y)
+                end),
                 anchorPoint = Vector2.new(),
                 transparency = 0,
                 color = ColorPallete.whiteOne
@@ -96,7 +121,7 @@ return function (scope: scope, props: {
                                 verticalAlignment = Enum.VerticalAlignment.Center,
                                 padding = UDim.new(0.01, 0),
                                 loadOrigin = "left",
-                                animationSide = "left",
+                                animationSide = "top",
                                 content = {
                                     scope:Text {
                                         disableShadow = true,
